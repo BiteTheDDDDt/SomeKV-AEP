@@ -1,1 +1,2 @@
-*.DS_DStore
+.vscode
+build

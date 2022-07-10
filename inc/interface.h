@@ -16,7 +16,7 @@ extern "C" {
 /*
  * Writes incoming data to the engine
  */
-void engine_write( void *ctx, const void *data, size_t len);
+void engine_write(void* ctx, const void* data, size_t len);
 
 /*
  * Simulate queries to a relational database：
@@ -25,8 +25,8 @@ void engine_write( void *ctx, const void *data, size_t len);
  * Column correspondence : Id=0, Userid=1, Name=2, Salary=3.
  * You need to read the data from engine into the res, and return the number of data tuples.
  */
-size_t engine_read( void *ctx, int32_t select_column,
-            int32_t where_column, const void *column_key, size_t column_key_len, void *res);
+size_t engine_read(void* ctx, int32_t select_column, int32_t where_column, const void* column_key,
+                   size_t column_key_len, void* res);
 
 /*
  * Initialization interface, which is called when the engine starts.
@@ -37,12 +37,11 @@ size_t engine_read( void *ctx, int32_t select_column,
  * aep_dir: AEP file directory, eg : "/mnt/aep/"
  * disk_dir: Disk file directory, eg : "/mnt/disk/"
  */
-void* engine_init(const char* host_info, const char* const* peer_host_info, size_t peer_host_info_num,
-                  const char* aep_dir, const char* disk_dir);
+void* engine_init(const char* host_info, const char* const* peer_host_info,
+                  size_t peer_host_info_num, const char* aep_dir, const char* disk_dir);
 
 /*
  * Used to release resources when the engine exits normally.
  */
-void engine_deinit(void *ctx);
-
+void engine_deinit(void* ctx);
 }
