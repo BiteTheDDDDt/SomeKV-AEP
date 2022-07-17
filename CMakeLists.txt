@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.1)
-project("interface")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++17")
+project("SomeKV-AEP")
 
-# generate .so file
-include_directories(inc)
-add_library(interface
-SHARED
-        src/interface.cpp
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+include_directories(
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/test
 )
+
+add_subdirectory(src)
+add_subdirectory(test)

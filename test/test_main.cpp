@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../inc/interface.h"
+#include "../src/interface.h"
 
 class TestUser {
 public:
@@ -25,4 +25,6 @@ int main() {
     std::cout << engine_read(ctx, Id, Name, &user.name, 8, res) << std::endl;
     std::cout << "res:" << *(int64_t*)res;
     engine_deinit(ctx);
+
+    return 0;
 }

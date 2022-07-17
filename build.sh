@@ -1,14 +1,7 @@
-# build interface
-rm -rf build && mkdir build
-cd build
-cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1
-make
-cd ..
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:build
 
-# build test executable
-cd test
+# build interface and test executable
 rm -rf build && mkdir build
 cd build
 cmake ..
 make
-cd ../..

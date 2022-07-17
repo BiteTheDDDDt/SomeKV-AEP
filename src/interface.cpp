@@ -1,10 +1,13 @@
-#include "../inc/interface.h"
+#include "interface.h"
 
 #include <string.h>
 
 #include <cstdlib>
 #include <iostream>
 #include <vector>
+
+#include "storage/storage_engine.h"
+#include "storage/storage_engine_factory.h"
 
 class User {
 public:
@@ -77,7 +80,9 @@ size_t engine_read(void* ctx, int32_t select_column, int32_t where_column, const
 
 void* engine_init(const char* host_info, const char* const* peer_host_info,
                   size_t peer_host_info_num, const char* aep_dir, const char* disk_dir) {
-    return nullptr;
+    return StorageEngineFactory::get_storage_engine();
 }
 
-void engine_deinit(void* ctx) {}
+void engine_deinit(void* ctx) {
+    delete static_cast<StorageEngine*>(ctx);
+}
