@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 
@@ -28,6 +29,7 @@ size_t engine_read(void* ctx, int32_t select_column, int32_t where_column, const
     int users_size = users.size();
     bool b = true;
     size_t res_num = 0;
+    res = malloc(128 * 2000);
     for (int i = 0; i < users_size; ++i) {
         switch (where_column) {
         case Id:
