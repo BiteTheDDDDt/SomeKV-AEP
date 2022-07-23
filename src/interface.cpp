@@ -16,7 +16,7 @@ size_t engine_read(void* ctx, int32_t select_column, int32_t where_column, const
 
 void* engine_init(const char* host_info, const char* const* peer_host_info,
                   size_t peer_host_info_num, const char* aep_dir, const char* disk_dir) {
-    return StorageEngineFactory::get_storage_engine();
+    return StorageEngineFactory::get_storage_engine(aep_dir, disk_dir);
 }
 
 void engine_deinit(void* ctx) {

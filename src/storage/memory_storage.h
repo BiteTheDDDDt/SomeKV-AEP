@@ -7,7 +7,7 @@
 
 #include "schema.h"
 
-class Memtable {
+class MemoryStorage {
 public:
     void write(const Schema::Row* row_ptr) { datas.emplace_back(*row_ptr); }
 
