@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glog/logging.h>
+
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
@@ -59,6 +61,9 @@ public:
                 }
             }
         }
+
+        LOG(INFO) << "Read: res_num=" << res_num;
+
         return res_num;
     }
 
