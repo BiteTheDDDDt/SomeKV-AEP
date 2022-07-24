@@ -18,3 +18,10 @@ inline uint64_t get_file_size(std::string path) {
         return file_stat.st_size;
     }
 }
+
+struct LOG{
+    void operator()(std::string str){
+        std::cout<<str<<std::endl;
+
+    }
+}
