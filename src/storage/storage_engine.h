@@ -10,7 +10,7 @@
 #include "storage/disk_storage.h"
 #include "storage/memory_storage.h"
 
-const std::string WAL_PATH_SUFFIX = std::string("/wal.dat");
+const std::string WAL_PATH_SUFFIX = std::string("wal.dat");
 
 class StorageEngine {
 public:

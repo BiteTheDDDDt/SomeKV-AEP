@@ -1,10 +1,11 @@
 #pragma once
 
 #include <fcntl.h>
+#include <glog/logging.h>
 #include <unistd.h>
 
-#include "utils/common.h"
 #include "schema.h"
+#include "utils/common.h"
 
 class WriteableFile {
 public:
@@ -26,6 +27,8 @@ public:
         if (!_data_count) {
             return;
         }
+
+        LOG(INFO) << "Flush: _data_count=" << _data_count;
 
         [[maybe_unused]] auto res = write(_fd, _buffer, _data_count * Schema::ROW_LENGTH);
         _data_count = 0;

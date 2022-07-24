@@ -1,18 +1,23 @@
 #pragma once
 
 #include <fcntl.h>
+#include <glog/logging.h>
 #include <unistd.h>
 
-#include "utils/common.h"
 #include "schema.h"
 #include "storage/memory_storage.h"
+#include "utils/common.h"
 
 class ReadableFile {
 public:
     ReadableFile(std::string path)
             : _fd(open(path.data(), O_RDWR)), _size(get_file_size(path) / Schema::ROW_LENGTH) {}
 
+    ~ReadableFile() { close(_fd); }
+
     MemoryStorage recover() {
+        LOG(INFO) << "Recover: _size=" << _size;
+
         MemoryStorage memtable;
 
         lseek(_fd, 0, SEEK_SET);
