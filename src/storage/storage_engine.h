@@ -24,7 +24,7 @@ public:
     ~StorageEngine() { LOG(INFO) << "Destroy StorageEngine. aep_dir=" << _storage_path; }
 
     void write(const void* data) {
-        std::unique_lock lock(_mtx);
+        // std::unique_lock lock(_mtx);
         const Schema::Row* row_ptr = static_cast<const Schema::Row*>(data);
         _memtable.write(row_ptr);
         _wal.write(row_ptr);
@@ -32,7 +32,7 @@ public:
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, void* res) {
-        std::unique_lock lock(_mtx);
+        // std::unique_lock lock(_mtx);
         return _memtable.read(select_column, where_column, column_key, column_key_len, res);
     }
 
