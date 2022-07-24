@@ -27,6 +27,6 @@ public:
     }
 
 private:
-    DiskStorage _wal;
     MemoryStorage _memtable;
+    DiskStorage _wal;
 };

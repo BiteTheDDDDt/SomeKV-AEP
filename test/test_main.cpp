@@ -73,6 +73,12 @@ void test_revover(int row_number_stage1, int row_number_stage2) {
             assert(false);
         }
     }
+
+    for (int i = 0; i < row_number_stage2; i++) {
+        engine_write(ctx, &rows[row_number_stage1 + i], Schema::ROW_LENGTH);
+    }
+
+    engine_deinit(ctx);
 }
 int main() {
     test_revover(10, 10);
