@@ -1,17 +1,5 @@
 # cmake_minimum_required (VERSION 3.16)
-project (glog
-  VERSION 0.6.0
-  DESCRIPTION "C++ implementation of the Google logging module"
-  HOMEPAGE_URL https://github.com/google/glog
-  LANGUAGES CXX
-)
-
-set (CPACK_PACKAGE_NAME glog)
-set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "Google logging library")
-set (CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
-set (CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
-set (CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-set (CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+project (glog)
 
 list (APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -658,9 +646,6 @@ if (ANDROID)
   set (glog_libraries_options_for_static_linking "${glog_libraries_options_for_static_linking} -llog")
 endif (ANDROID)
 
-set_target_properties (glog PROPERTIES VERSION ${PROJECT_VERSION})
-set_target_properties (glog PROPERTIES SOVERSION 1)
-
 if (CYGWIN OR WIN32)
   target_compile_definitions (glog PUBLIC GLOG_NO_ABBREVIATED_SEVERITIES)
 endif (CYGWIN OR WIN32)
@@ -1020,10 +1005,6 @@ configure_package_config_file (glog-config.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/glog-config.cmake
   INSTALL_DESTINATION ${_glog_CMake_INSTALLDIR}
   NO_CHECK_REQUIRED_COMPONENTS_MACRO)
-
-write_basic_package_version_file (
-  ${CMAKE_CURRENT_BINARY_DIR}/glog-config-version.cmake
-  COMPATIBILITY SameMajorVersion)
 
 export (TARGETS glog NAMESPACE glog:: FILE glog-targets.cmake)
 export (PACKAGE glog)
