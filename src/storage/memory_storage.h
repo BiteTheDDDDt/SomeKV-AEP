@@ -88,7 +88,7 @@ public:
             }
         }
 
-        LOG(INFO) << "Read: res_num=" << select_number;
+        // LOG(INFO) << "Read: res_num=" << select_number;
 
         return select_number;
     }

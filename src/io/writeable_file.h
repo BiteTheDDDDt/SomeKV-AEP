@@ -28,7 +28,7 @@ public:
             return;
         }
 
-        LOG(INFO) << "Flush: _data_count=" << _data_count;
+        // LOG(INFO) << "Flush: _data_count=" << _data_count;
 
         [[maybe_unused]] auto res = write(_fd, _buffer, _data_count * Schema::ROW_LENGTH);
         _data_count = 0;
