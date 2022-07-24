@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.16)
+# cmake_minimum_required (VERSION 3.16)
 project (glog
   VERSION 0.6.0
   DESCRIPTION "C++ implementation of the Google logging module"
@@ -38,15 +38,15 @@ option (BUILD_SHARED_LIBS "Build shared libraries" ON)
 option (PRINT_UNSYMBOLIZED_STACK_TRACES
   "Print file offsets in traces instead of symbolizing" OFF)
 option (WITH_CUSTOM_PREFIX "Enable support for user-generated message prefixes" ON)
-option (WITH_GFLAGS "Use gflags" ON)
-option (WITH_GTEST "Use Google Test" ON)
-option (WITH_PKGCONFIG "Enable pkg-config support" ON)
+option (WITH_GFLAGS "Use gflags" OFF)
+option (WITH_GTEST "Use Google Test" OFF)
+option (WITH_PKGCONFIG "Enable pkg-config support" OFF)
 option (WITH_SYMBOLIZE "Enable symbolize module" ON)
 option (WITH_THREADS "Enable multithreading support" ON)
 option (WITH_TLS "Enable Thread Local Storage (TLS) support" ON)
-option (WITH_UNWIND "Enable libunwind support" ON)
+option (WITH_UNWIND "Enable libunwind support" OFF)
 
-cmake_dependent_option (WITH_GMOCK "Use Google Mock" ON WITH_GTEST OFF)
+cmake_dependent_option (WITH_GMOCK "Use Google Mock" OFF WITH_GTEST OFF)
 
 if (NOT WITH_UNWIND)
   set (CMAKE_DISABLE_FIND_PACKAGE_Unwind ON)
