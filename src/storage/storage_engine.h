@@ -24,7 +24,7 @@ public:
     ~StorageEngine() { LOG(INFO) << "Destroy StorageEngine. aep_dir=" << _storage_path; }
 
     void write(const void* data) {
-        // std::unique_lock lock(_mtx);
+        std::unique_lock lock(_mtx);
         const Schema::Row* row_ptr = static_cast<const Schema::Row*>(data);
         _memtable.write(row_ptr);
         _wal.write(row_ptr);
