@@ -9,8 +9,7 @@
 
 class WriteableFile {
 public:
-    WriteableFile(std::string path)
-            : _fd(open(path.data(), O_APPEND | O_WRONLY | O_CREAT | O_SYNC, 0644)) {}
+    WriteableFile(std::string path) : _fd(open(path.data(), O_APPEND | O_WRONLY | O_CREAT, 0644)) {}
 
     ~WriteableFile() {
         flush();
@@ -33,6 +32,7 @@ public:
 
         [[maybe_unused]] auto res = write(_fd, _buffer, _data_count * Schema::ROW_LENGTH);
         _data_count = 0;
+        syncfs(_fd);
     }
 
 private:
