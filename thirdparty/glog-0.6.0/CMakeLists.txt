@@ -15,8 +15,6 @@ include (CheckTypeSize)
 include (CMakeDependentOption)
 include (CMakePackageConfigHelpers)
 include (CMakePushCheckState)
-include (CPack)
-include (CTest)
 include (DetermineGflagsNamespace)
 include (GenerateExportHeader)
 include (GetCacheVariables)
@@ -598,11 +596,6 @@ if (CYGWIN OR WIN32)
   )
 endif (CYGWIN OR WIN32)
 
-add_library (glogbase
-  ${_glog_BINARY_CMake_MODULES}
-  ${GLOG_SRCS}
-)
-
 add_library (glog
   ${_glog_BINARY_CMake_MODULES}
   ${GLOG_SRCS}
@@ -664,23 +657,7 @@ target_include_directories (glog BEFORE PUBLIC
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-if (CYGWIN OR WIN32)
-  target_include_directories (glogbase PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/windows>"
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/windows)
-
-  target_include_directories (glog PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/windows>"
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/windows)
-endif (CYGWIN OR WIN32)
-
 set_target_properties (glog PROPERTIES DEFINE_SYMBOL GOOGLE_GLOG_IS_A_DLL)
-
-target_include_directories (glogbase PUBLIC
-  $<TARGET_PROPERTY:glog,INCLUDE_DIRECTORIES>)
-target_compile_definitions (glogbase PUBLIC
-  $<TARGET_PROPERTY:glog,COMPILE_DEFINITIONS>
-  PRIVATE GOOGLE_GLOG_IS_A_DLL)
 
 generate_export_header (glog
   EXPORT_MACRO_NAME GLOG_EXPORT
