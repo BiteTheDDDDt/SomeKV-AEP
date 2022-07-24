@@ -15,34 +15,36 @@ public:
 
     std::vector<uint8_t> update_selector(int32_t where_column, const void* column_key,
                                          size_t column_key_len) {
-        std::vector<uint8_t> _selector;
-        _selector.resize(_datas.size());
+        std::vector<uint8_t> selector;
+        selector.resize(_datas.size());
 
         if (where_column == Schema::Column::Id) {
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
             for (size_t i = 0; i < _datas.size(); ++i) {
-                _selector[i] = _datas[i].id == key_value;
+                selector[i] = _datas[i].id == key_value;
             }
         }
 
         if (where_column == Schema::Column::Salary) {
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
             for (size_t i = 0; i < _datas.size(); ++i) {
-                _selector[i] = _datas[i].salary == key_value;
+                selector[i] = _datas[i].salary == key_value;
             }
         }
 
         if (where_column == Schema::Column::Userid) {
             for (size_t i = 0; i < _datas.size(); ++i) {
-                _selector[i] = memcmp(column_key, &_datas[i].user_id, column_key_len) == 0;
+                selector[i] = memcmp(column_key, &_datas[i].user_id, column_key_len) == 0;
             }
         }
 
         if (where_column == Schema::Column::Name) {
             for (size_t i = 0; i < _datas.size(); ++i) {
-                _selector[i] = memcmp(column_key, &_datas[i].name, column_key_len) == 0;
+                selector[i] = memcmp(column_key, &_datas[i].name, column_key_len) == 0;
             }
         }
+
+        return selector;
     }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
