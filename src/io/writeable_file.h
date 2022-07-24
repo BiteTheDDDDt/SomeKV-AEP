@@ -1,3 +1,5 @@
+#pragma once
+
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -7,10 +9,10 @@
 #include "io/common.h"
 #include "schema.h"
 
-class WritableFile {
+class WriteableFile {
 public:
-    WritableFile(std::string path) { _fd = open(path.data(), O_TRUNC | O_WRONLY | O_CREAT); }
-    ~WritableFile() {
+    WriteableFile(std::string path) { _fd = open(path.data(), O_TRUNC | O_WRONLY | O_CREAT, 0644); }
+    ~WriteableFile() {
         flush();
         close(_fd);
     }
@@ -23,7 +25,7 @@ public:
         }
     }
     void flush() {
-        write(_fd, _buffer, _data_count * Schema::ROW_LENGTH);
+        [[maybe_unused]] auto res = write(_fd, _buffer, _data_count * Schema::ROW_LENGTH);
         _data_count = 0;
     }
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstddef>
 
 constexpr const size_t READ_FILE_BUFFER_SIZE = 512;

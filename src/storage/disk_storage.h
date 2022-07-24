@@ -1,6 +1,6 @@
 #pragma once
 
-#include "io/writable_file.h"
+#include "io/writeable_file.h"
 
 class DiskStorage {
 public:
@@ -9,5 +9,5 @@ public:
     void write(const Schema::Row* row_ptr) { _wal.append(row_ptr); }
 
 private:
-    WritableFile _wal;
+    WriteableFile _wal;
 };

@@ -4,15 +4,21 @@
 
 #include "io/readable_file.h"
 #include "schema.h"
+#include "storage/disk_storage.h"
 #include "storage/memory_storage.h"
+
+const std::string WAL_PATH_SUFFIX = "/wal.dat";
 
 class StorageEngine {
 public:
-    StorageEngine(const std::string& aep_dir) : _memtable(ReadableFile(aep_dir).recover()) {}
+    StorageEngine(const std::string& aep_dir)
+            : _memtable(ReadableFile(aep_dir + WAL_PATH_SUFFIX).recover()),
+              _wal(aep_dir + WAL_PATH_SUFFIX) {}
 
     void write(const void* data) {
         const Schema::Row* row_ptr = static_cast<const Schema::Row*>(data);
         _memtable.write(row_ptr);
+        _wal.write(row_ptr);
     }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
@@ -21,5 +27,6 @@ public:
     }
 
 private:
+    DiskStorage _wal;
     MemoryStorage _memtable;
 };
