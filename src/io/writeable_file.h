@@ -9,7 +9,8 @@
 
 class WriteableFile {
 public:
-    WriteableFile(std::string path) : _fd(open(path.data(), O_APPEND | O_WRONLY | O_CREAT, 0644)) {}
+    WriteableFile(std::string path)
+            : _fd(open(path.data(), O_APPEND | O_WRONLY | O_CREAT | O_SYNC, 0644)) {}
 
     ~WriteableFile() {
         flush();
