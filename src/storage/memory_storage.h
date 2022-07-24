@@ -7,66 +7,93 @@
 #include <cstring>
 #include <vector>
 
-#include "schema.h"
+#include "utils/schema.h"
 
 class MemoryStorage {
 public:
-    void write(const Schema::Row* row_ptr) { datas.emplace_back(*row_ptr); }
+    void write(const Schema::Row* row_ptr) { _datas.emplace_back(*row_ptr); }
+
+    void update_selector(int32_t where_column, const void* column_key, size_t column_key_len) {
+        _selector.resize(_datas.size());
+
+        if (where_column == Schema::Column::Id) {
+            const int64_t key_value = *static_cast<const int64_t*>(column_key);
+            for (size_t i = 0; i < _datas.size(); ++i) {
+                _selector[i] = _datas[i].id == key_value;
+            }
+        }
+
+        if (where_column == Schema::Column::Salary) {
+            const int64_t key_value = *static_cast<const int64_t*>(column_key);
+            for (size_t i = 0; i < _datas.size(); ++i) {
+                _selector[i] = _datas[i].salary == key_value;
+            }
+        }
+
+        if (where_column == Schema::Column::Userid) {
+            for (size_t i = 0; i < _datas.size(); ++i) {
+                _selector[i] = memcmp(column_key, &_datas[i].user_id, column_key_len) == 0;
+            }
+        }
+
+        if (where_column == Schema::Column::Name) {
+            for (size_t i = 0; i < _datas.size(); ++i) {
+                _selector[i] = memcmp(column_key, &_datas[i].name, column_key_len) == 0;
+            }
+        }
+    }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, void* res) {
-        bool is_equal = true;
-        size_t res_num = 0;
-        res = malloc(128 * 2000);
+        update_selector(where_column, column_key, column_key_len);
 
-        for (size_t i = 0; i < datas.size(); ++i) {
-            switch (where_column) {
-            case 0:
-                is_equal = memcmp(column_key, &datas[i].id, column_key_len) == 0;
-                break;
-            case 1:
-                is_equal = memcmp(column_key, datas[i].user_id, column_key_len) == 0;
-                break;
-            case 2:
-                is_equal = memcmp(column_key, datas[i].name, column_key_len) == 0;
-                break;
-            case 3:
-                is_equal = memcmp(column_key, &datas[i].salary, column_key_len) == 0;
-                break;
-            default:
-                is_equal = false;
-                break; // wrong
-            }
-            if (is_equal) {
-                ++res_num;
-                switch (select_column) {
-                case 0:
-                    memcpy(res, &datas[i].id, 8);
-                    res = (char*)res + 8;
-                    break;
-                case 1:
-                    memcpy(res, datas[i].user_id, 128);
-                    res = (char*)res + 128;
-                    break;
-                case 2:
-                    memcpy(res, datas[i].name, 128);
-                    res = (char*)res + 128;
-                    break;
-                case 3:
-                    memcpy(res, &datas[i].salary, 8);
-                    res = (char*)res + 8;
-                    break;
-                default:
-                    break; // wrong
+        size_t select_number = 0;
+        for (size_t i = 0; i < _selector.size(); i++) {
+            select_number += _selector[i];
+        }
+
+        if (select_column == Schema::Column::Id) {
+            for (size_t i = 0; i < _datas.size(); ++i) {
+                if (_selector[i]) {
+                    memcpy(res, &_datas[i].id, Schema::ID_LENGTH);
+                    res = (char*)res + Schema::ID_LENGTH;
                 }
             }
         }
 
-        LOG(INFO) << "Read: res_num=" << res_num;
+        if (select_column == Schema::Column::Salary) {
+            for (size_t i = 0; i < _datas.size(); ++i) {
+                if (_selector[i]) {
+                    memcpy(res, &_datas[i].salary, Schema::SALARY_LENGTH);
+                    res = (char*)res + Schema::SALARY_LENGTH;
+                }
+            }
+        }
 
-        return res_num;
+        if (select_column == Schema::Column::Userid) {
+            for (size_t i = 0; i < _datas.size(); ++i) {
+                if (_selector[i]) {
+                    memcpy(res, &_datas[i].user_id, Schema::USERID_LENGTH);
+                    res = (char*)res + Schema::USERID_LENGTH;
+                }
+            }
+        }
+
+        if (select_column == Schema::Column::Name) {
+            for (size_t i = 0; i < _datas.size(); ++i) {
+                if (_selector[i]) {
+                    memcpy(res, &_datas[i].name, Schema::NAME_LENGTH);
+                    res = (char*)res + Schema::NAME_LENGTH;
+                }
+            }
+        }
+
+        LOG(INFO) << "Read: res_num=" << select_number;
+
+        return select_number;
     }
 
 private:
-    std::vector<Schema::Row> datas;
+    std::vector<Schema::Row> _datas;
+    std::vector<uint8_t> _selector;
 };

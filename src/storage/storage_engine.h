@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include "io/readable_file.h"
-#include "schema.h"
+#include "utils/schema.h"
 #include "storage/disk_storage.h"
 #include "storage/memory_storage.h"
 

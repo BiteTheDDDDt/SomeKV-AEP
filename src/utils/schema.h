@@ -34,6 +34,10 @@ struct Row {
 enum Column { Id = 0, Userid = 1, Name = 2, Salary = 3 };
 
 constexpr int ROW_LENGTH = sizeof(Row);
+constexpr int ID_LENGTH = sizeof(Row::id);
+constexpr int USERID_LENGTH = sizeof(Row::user_id);
+constexpr int NAME_LENGTH = sizeof(Row::name);
+constexpr int SALARY_LENGTH = sizeof(Row::salary);
 
 inline Row create_from_address(const void* address) {
     Row row;

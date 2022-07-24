@@ -1,4 +1,4 @@
-#include <assert.h>
+#include <glog/logging.h>
 #include <string.h>
 
 #include <iostream>
@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "interface.h"
-#include "schema.h"
+#include "utils/schema.h"
 
 const char* AEP_DIR = "storage/aep/";
 const char* DISK_DIR = "storage/disk/";
@@ -38,17 +38,14 @@ void test_revover(int row_number_stage1, int row_number_stage2) {
     size_t read_num = engine_read(ctx, Schema::Column::Id, Schema::Column::Name, "hello", 5, res);
 
     if (read_num != row_number_stage1) {
-        std::cout << "stage1 read_num!=row_number_stage1" << std::endl;
-        assert(false);
+        LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
     }
 
     for (int i = 0; i < row_number_stage1; i++) {
         auto real = Schema::create_from_address(res + Schema::ROW_LENGTH * i);
         if (equal(real, rows[i])) {
-            std::cout << "stage1 write/read test check fail." << std::endl;
-            std::cout << "expect: " + rows[i].to_string() << std::endl;
-            std::cout << "expect: " + rows[i].to_string() << std::endl;
-            assert(false);
+            LOG(FATAL) << "real: " + real.to_string() << " "
+                       << "expect: " + rows[i].to_string();
         }
     }
 
@@ -60,17 +57,14 @@ void test_revover(int row_number_stage1, int row_number_stage2) {
     read_num = engine_read(ctx, Schema::Column::Id, Schema::Column::Name, "hello", 5, res);
 
     if (read_num != row_number_stage1) {
-        std::cout << "stage2 read_num!=row_number_stage1" << std::endl;
-        assert(false);
+        LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
     }
 
     for (int i = 0; i < row_number_stage1; i++) {
         auto real = Schema::create_from_address(res + Schema::ROW_LENGTH * i);
         if (equal(real, rows[i])) {
-            std::cout << "stage2 write/read test check fail." << std::endl;
-            std::cout << "expect: " + rows[i].to_string() << std::endl;
-            std::cout << "expect: " + rows[i].to_string() << std::endl;
-            assert(false);
+            LOG(FATAL) << "real: " + real.to_string() << " "
+                       << "expect: " + rows[i].to_string();
         }
     }
 
@@ -83,6 +77,6 @@ void test_revover(int row_number_stage1, int row_number_stage2) {
 int main() {
     test_revover(10, 10);
 
-    std::cout << "pass all check" << std::endl;
+    LOG(INFO) << "pass all check";
     return 0;
 }

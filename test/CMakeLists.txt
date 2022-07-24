@@ -8,3 +8,4 @@ set_target_properties(intserface PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR
 
 add_executable(SomeKV-AEP test_main.cpp)
 target_link_libraries(SomeKV-AEP intserface)
+target_link_libraries (SomeKV-AEP glog::glog)

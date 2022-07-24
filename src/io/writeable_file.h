@@ -4,8 +4,8 @@
 #include <glog/logging.h>
 #include <unistd.h>
 
-#include "schema.h"
 #include "utils/common.h"
+#include "utils/schema.h"
 
 class WriteableFile {
 public:

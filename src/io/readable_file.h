@@ -4,9 +4,9 @@
 #include <glog/logging.h>
 #include <unistd.h>
 
-#include "schema.h"
 #include "storage/memory_storage.h"
 #include "utils/common.h"
+#include "utils/schema.h"
 
 class ReadableFile {
 public:
