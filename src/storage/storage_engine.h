@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glog/logging.h>
+
 #include <cstdlib>
 #include <mutex>
 
@@ -8,7 +10,7 @@
 #include "storage/disk_storage.h"
 #include "storage/memory_storage.h"
 
-const std::string WAL_PATH_SUFFIX = "/wal.dat";
+const std::string WAL_PATH_SUFFIX = std::string("/wal.dat");
 
 class StorageEngine {
 public:

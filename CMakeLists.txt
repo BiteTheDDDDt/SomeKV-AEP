@@ -11,6 +11,8 @@ include_directories(
 
 add_subdirectory(src)
 
+add_subdirectory(thirdparty/glog-0.6.0)
+
 if(MAKE_TEST STREQUAL "ON")
     add_subdirectory(test)
 endif()
