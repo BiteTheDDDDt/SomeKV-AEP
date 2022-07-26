@@ -6,6 +6,6 @@
 
 struct StorageEngineFactory {
     static StorageEngine* get_storage_engine(const char* aep_dir, const char* disk_dir) {
-        return new StorageEngine(std::string(aep_dir));
+        return new StorageEngine(std::string(aep_dir), std::string(disk_dir));
     }
 };

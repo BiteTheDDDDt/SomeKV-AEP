@@ -30,7 +30,6 @@ public:
 
         [[maybe_unused]] auto res = fwrite(_buffer, 1, _data_count * Schema::ROW_LENGTH, _fp);
         _data_count = 0;
-        syncfs(_fd);
     }
 
 private:

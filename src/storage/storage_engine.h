@@ -6,22 +6,22 @@
 #include <mutex>
 
 #include "io/readable_file.h"
-#include "utils/schema.h"
 #include "storage/disk_storage.h"
 #include "storage/memory_storage.h"
+#include "utils/schema.h"
 
 const std::string WAL_PATH_SUFFIX = std::string("wal.dat");
 
 class StorageEngine {
 public:
-    StorageEngine(const std::string& aep_dir)
-            : _storage_path(aep_dir + WAL_PATH_SUFFIX),
+    StorageEngine(const std::string& aep_dir, const std::string& disk_dir)
+            : _storage_path(disk_dir + WAL_PATH_SUFFIX),
               _memtable(ReadableFile(_storage_path).recover()),
               _wal(_storage_path) {
-        LOG(INFO) << "Create StorageEngine. aep_dir=" << _storage_path;
+        LOG(INFO) << "Create StorageEngine. _storage_path=" << _storage_path;
     }
 
-    ~StorageEngine() { LOG(INFO) << "Destroy StorageEngine. aep_dir=" << _storage_path; }
+    ~StorageEngine() { LOG(INFO) << "Destroy StorageEngine. _storage_path=" << _storage_path; }
 
     void write(const void* data) {
         std::unique_lock lock(_mtx);
