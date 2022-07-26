@@ -45,6 +45,14 @@ inline Row create_from_address(const void* address) {
     return row;
 }
 
+inline int64_t create_from_int64(const void* address) {
+    return *static_cast<const int64_t*>(address);
+}
+
+inline std::string create_from_string(const void* address) {
+    return std::string(static_cast<const char*>(address));
+}
+
 inline bool equal(const Row& lhs, const Row& rhs) {
     return memcmp(&lhs, &rhs, ROW_LENGTH) == 0;
 }

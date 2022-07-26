@@ -11,7 +11,7 @@
 const char* AEP_DIR = "storage/aep/";
 const char* DISK_DIR = "storage/disk/";
 
-void test_revover(int row_number_stage1, int row_number_stage2) {
+void test_revover(size_t row_number_stage1, size_t row_number_stage2) {
     std::vector<Schema::Row> rows;
     rows.resize(row_number_stage1 + row_number_stage2);
 
@@ -40,12 +40,11 @@ void test_revover(int row_number_stage1, int row_number_stage2) {
     if (read_num != row_number_stage1) {
         LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
     }
-
     for (int i = 0; i < row_number_stage1; i++) {
-        auto real = Schema::create_from_address(res + Schema::ROW_LENGTH * i);
-        if (equal(real, rows[i])) {
-            LOG(FATAL) << "real: " + real.to_string() << " "
-                       << "expect: " + rows[i].to_string();
+        auto real = Schema::create_from_int64(res + Schema::ID_LENGTH * i);
+        if (real != rows[i].id) {
+            LOG(FATAL) << "real: " << real << " "
+                       << "expect: " << rows[i].id;
         }
     }
 
@@ -59,12 +58,50 @@ void test_revover(int row_number_stage1, int row_number_stage2) {
     if (read_num != row_number_stage1) {
         LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
     }
-
     for (int i = 0; i < row_number_stage1; i++) {
-        auto real = Schema::create_from_address(res + Schema::ROW_LENGTH * i);
-        if (equal(real, rows[i])) {
-            LOG(FATAL) << "real: " + real.to_string() << " "
-                       << "expect: " + rows[i].to_string();
+        auto real = Schema::create_from_int64(res + Schema::ID_LENGTH * i);
+        if (real != rows[i].id) {
+            LOG(FATAL) << "real: " << real << " "
+                       << "expect: " << rows[i].id;
+        }
+    }
+
+    read_num = engine_read(ctx, Schema::Column::Name, Schema::Column::Name, "hello", 5, res);
+
+    if (read_num != row_number_stage1) {
+        LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
+    }
+    for (int i = 0; i < row_number_stage1; i++) {
+        auto real = Schema::create_from_string(res + Schema::NAME_LENGTH * i);
+        if (real != rows[i].name) {
+            LOG(FATAL) << "real: " << real << " "
+                       << "expect: " << rows[i].name;
+        }
+    }
+
+    read_num = engine_read(ctx, Schema::Column::Salary, Schema::Column::Name, "hello", 5, res);
+
+    if (read_num != row_number_stage1) {
+        LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
+    }
+    for (int i = 0; i < row_number_stage1; i++) {
+        auto real = Schema::create_from_int64(res + Schema::SALARY_LENGTH * i);
+        if (real != rows[i].salary) {
+            LOG(FATAL) << "real: " << real << " "
+                       << "expect: " << rows[i].salary;
+        }
+    }
+
+    read_num = engine_read(ctx, Schema::Column::Userid, Schema::Column::Name, "hello", 5, res);
+
+    if (read_num != row_number_stage1) {
+        LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
+    }
+    for (int i = 0; i < row_number_stage1; i++) {
+        auto real = Schema::create_from_string(res + Schema::USERID_LENGTH * i);
+        if (real != rows[i].user_id) {
+            LOG(FATAL) << "real: " << real << " "
+                       << "expect: " << rows[i].user_id;
         }
     }
 

@@ -2,7 +2,9 @@
 
 #include <glog/logging.h>
 
+#include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <unordered_map>
@@ -60,6 +62,64 @@ public:
 
         size_t select_number = selector.size();
 
+        if (select_column == Schema::Column::Id) {
+            std::vector<int64_t> data;
+            for (auto i : selector) {
+                data.emplace_back(_datas[i].id);
+            }
+            std::sort(data.begin(), data.end());
+            for (auto i : data) {
+                memcpy(res, &i, Schema::ID_LENGTH);
+                res = (char*)res + Schema::ID_LENGTH;
+            }
+        }
+
+        if (select_column == Schema::Column::Salary) {
+            std::vector<int64_t> data;
+            for (auto i : selector) {
+                data.emplace_back(_datas[i].salary);
+            }
+            std::sort(data.begin(), data.end());
+            for (auto i : data) {
+                memcpy(res, &i, Schema::SALARY_LENGTH);
+                res = (char*)res + Schema::SALARY_LENGTH;
+            }
+        }
+
+        if (select_column == Schema::Column::Userid) {
+            std::vector<std::string> data;
+            for (auto i : selector) {
+                data.emplace_back(_datas[i].user_id);
+            }
+            std::sort(data.begin(), data.end());
+            for (auto i : data) {
+                memset(res, 0, Schema::USERID_LENGTH);
+                memcpy(res, i.data(), i.length());
+                res = (char*)res + Schema::USERID_LENGTH;
+            }
+        }
+
+        if (select_column == Schema::Column::Name) {
+            std::vector<std::string> data;
+            for (auto i : selector) {
+                data.emplace_back(_datas[i].name);
+            }
+            std::sort(data.begin(), data.end());
+            for (auto i : data) {
+                memset(res, 0, Schema::NAME_LENGTH);
+                memcpy(res, i.data(), i.length());
+                res = (char*)res + Schema::NAME_LENGTH;
+            }
+        }
+
+        /*
+        if (select_column == Schema::Column::Id) {
+            for (auto i : selector) {
+                memcpy(res, &_datas[i].id, Schema::ID_LENGTH);
+                res = (char*)res + Schema::ID_LENGTH;
+            }
+        }
+
         if (select_column == Schema::Column::Salary) {
             for (auto i : selector) {
                 memcpy(res, &_datas[i].salary, Schema::SALARY_LENGTH);
@@ -80,7 +140,7 @@ public:
                 res = (char*)res + Schema::NAME_LENGTH;
             }
         }
-
+*/
         LOG(INFO) << "Read: res_num=" << select_number << " " << vector_to_string(selector);
 
         return select_number;
