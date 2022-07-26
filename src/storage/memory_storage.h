@@ -24,6 +24,9 @@ public:
 
     std::vector<size_t> get_selector(int32_t where_column, const void* column_key,
                                      size_t column_key_len) {
+        LOG(INFO) << "Read: Predicate(column_key="
+                  << std::string(static_cast<const char*>(column_key), column_key_len)
+                  << ", column_key_len" << column_key_len << ")";
         std::vector<size_t> selector;
 
         if (where_column == Schema::Column::Id) {
