@@ -32,7 +32,9 @@ public:
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, void* res) {
-        // std::unique_lock lock(_mtx);
+        std::unique_lock lock(_mtx);
+        LOG(INFO) << "Read: Query(select_column=" << select_column
+                  << ", where_column=" << where_column << ")";
         return _memtable.read(select_column, where_column, column_key, column_key_len, res);
     }
 

@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 constexpr const size_t READ_FILE_BUFFER_SIZE = 512;
 
@@ -17,4 +18,19 @@ inline uint64_t get_file_size(std::string path) {
     } else {
         return file_stat.st_size;
     }
+}
+
+inline std::string vector_to_string(const std::vector<size_t> v) {
+    std::string str;
+
+    str += '[';
+    for (auto x : v) {
+        if (str.length() > 1) {
+            str += ",";
+        }
+        str += std::to_string(x);
+    }
+    str += ']';
+
+    return str;
 }

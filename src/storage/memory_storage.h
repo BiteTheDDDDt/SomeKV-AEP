@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "utils/common.h"
 #include "utils/schema.h"
 
 class MemoryStorage {
@@ -80,7 +81,7 @@ public:
             }
         }
 
-        // LOG(INFO) << "Read: res_num=" << select_number;
+        LOG(INFO) << "Read: res_num=" << select_number << " " << vector_to_string(selector);
 
         return select_number;
     }
