@@ -25,7 +25,7 @@ public:
 
     void write(const void* data) {
         std::unique_lock lock(_mtx);
-        LOG(INFO) << "Write: " << create_from_address(data).to_string();
+        //LOG(INFO) << "Write: " << create_from_address(data).to_string();
         const Schema::Row* row_ptr = static_cast<const Schema::Row*>(data);
         _memtable.write(row_ptr);
         _wal.write(row_ptr);
