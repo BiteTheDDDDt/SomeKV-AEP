@@ -17,7 +17,7 @@ class MemoryStorage {
 public:
     void write(const Schema::Row* row_ptr) {
         id_index[row_ptr->id] = _datas.size();
-        user_id_index[std::string(row_ptr->user_id)] = _datas.size();
+        user_id_index[create_from_string128(row_ptr->user_id)] = _datas.size();
 
         _datas.emplace_back(*row_ptr);
     }
@@ -45,14 +45,14 @@ public:
         }
 
         if (where_column == Schema::Column::Userid) {
-            LOG(INFO) << "Read: Predicate(column_key=" << create_from_string(column_key)
+            LOG(INFO) << "Read: Predicate(column_key=" << create_from_string128(column_key)
                       << ", column_key_len=" << column_key_len << ")";
-            auto key_value = std::string(static_cast<const char*>(column_key), column_key_len);
+            auto key_value = create_from_string128(column_key);
             selector.push_back(user_id_index[key_value]);
         }
 
         if (where_column == Schema::Column::Name) {
-            LOG(INFO) << "Read: Predicate(column_key=" << create_from_string(column_key)
+            LOG(INFO) << "Read: Predicate(column_key=" << create_from_string128(column_key)
                       << ", column_key_len=" << column_key_len << ")";
             for (size_t i = 0; i < _datas.size(); ++i) {
                 if (memcmp(column_key, &_datas[i].name, column_key_len) == 0) {
