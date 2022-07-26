@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "interface.h"
+#include "utils/common.h"
 #include "utils/schema.h"
 
 const char* AEP_DIR = "storage/aep/";
@@ -41,7 +42,7 @@ void test_revover(size_t row_number_stage1, size_t row_number_stage2) {
         LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
     }
     for (int i = 0; i < row_number_stage1; i++) {
-        auto real = Schema::create_from_int64(res + Schema::ID_LENGTH * i);
+        auto real = create_from_int64(res + Schema::ID_LENGTH * i);
         if (real != rows[i].id) {
             LOG(FATAL) << "real: " << real << " "
                        << "expect: " << rows[i].id;
@@ -59,7 +60,7 @@ void test_revover(size_t row_number_stage1, size_t row_number_stage2) {
         LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
     }
     for (int i = 0; i < row_number_stage1; i++) {
-        auto real = Schema::create_from_int64(res + Schema::ID_LENGTH * i);
+        auto real = create_from_int64(res + Schema::ID_LENGTH * i);
         if (real != rows[i].id) {
             LOG(FATAL) << "real: " << real << " "
                        << "expect: " << rows[i].id;
@@ -72,7 +73,7 @@ void test_revover(size_t row_number_stage1, size_t row_number_stage2) {
         LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
     }
     for (int i = 0; i < row_number_stage1; i++) {
-        auto real = Schema::create_from_string(res + Schema::NAME_LENGTH * i);
+        auto real = create_from_string(res + Schema::NAME_LENGTH * i);
         if (real != rows[i].name) {
             LOG(FATAL) << "real: " << real << " "
                        << "expect: " << rows[i].name;
@@ -85,7 +86,7 @@ void test_revover(size_t row_number_stage1, size_t row_number_stage2) {
         LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
     }
     for (int i = 0; i < row_number_stage1; i++) {
-        auto real = Schema::create_from_int64(res + Schema::SALARY_LENGTH * i);
+        auto real = create_from_int64(res + Schema::SALARY_LENGTH * i);
         if (real != rows[i].salary) {
             LOG(FATAL) << "real: " << real << " "
                        << "expect: " << rows[i].salary;
@@ -98,7 +99,7 @@ void test_revover(size_t row_number_stage1, size_t row_number_stage2) {
         LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
     }
     for (int i = 0; i < row_number_stage1; i++) {
-        auto real = Schema::create_from_string(res + Schema::USERID_LENGTH * i);
+        auto real = create_from_string(res + Schema::USERID_LENGTH * i);
         if (real != rows[i].user_id) {
             LOG(FATAL) << "real: " << real << " "
                        << "expect: " << rows[i].user_id;
