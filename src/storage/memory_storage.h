@@ -15,11 +15,12 @@
 
 class MemoryStorage {
 public:
-    void write(const Schema::Row* row_ptr) {
-        id_index[row_ptr->id] = _datas.size();
-        user_id_index[create_from_string128(row_ptr->user_id)] = _datas.size();
+    void write(const void* row_ptr) {
+        Schema::Row row = create_from_address(row_ptr);
+        id_index[row.id] = _datas.size();
+        user_id_index[create_from_string128(row.user_id)] = _datas.size();
 
-        _datas.emplace_back(*row_ptr);
+        _datas.emplace_back(row);
     }
 
     std::vector<size_t> get_selector(int32_t where_column, const void* column_key,
@@ -97,12 +98,11 @@ public:
         if (select_column == Schema::Column::Userid) {
             std::vector<std::string> data;
             for (auto i : selector) {
-                data.emplace_back(_datas[i].user_id);
+                data.emplace_back(create_from_string128(_datas[i].user_id));
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
-                memset(res, 0, Schema::USERID_LENGTH);
-                memcpy(res, i.data(), i.length());
+                memcpy(res, i.data(), Schema::USERID_LENGTH);
                 res = (char*)res + Schema::USERID_LENGTH;
             }
         }
@@ -110,12 +110,11 @@ public:
         if (select_column == Schema::Column::Name) {
             std::vector<std::string> data;
             for (auto i : selector) {
-                data.emplace_back(_datas[i].name);
+                data.emplace_back(create_from_string128(_datas[i].name));
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
-                memset(res, 0, Schema::NAME_LENGTH);
-                memcpy(res, i.data(), i.length());
+                memcpy(res, i.data(), Schema::NAME_LENGTH);
                 res = (char*)res + Schema::NAME_LENGTH;
             }
         }
