@@ -111,6 +111,22 @@ void test_revover(size_t row_number_stage1, size_t row_number_stage2) {
     }
 
     engine_deinit(ctx);
+    ctx = engine_init(nullptr, nullptr, 0, AEP_DIR, DISK_DIR);
+
+    read_num = engine_read(ctx, Schema::Column::Userid, Schema::Column::Name, "hello", 5, res);
+
+    if (read_num != row_number_stage1 + row_number_stage2) {
+        LOG(FATAL) << " read_num=" << read_num << ", row_number_stage1=" << row_number_stage1;
+    }
+    for (int i = 0; i < row_number_stage1 + row_number_stage2; i++) {
+        auto real = create_from_string128(res + Schema::USERID_LENGTH * i);
+        if (real != create_from_string128(rows[i].user_id)) {
+            LOG(FATAL) << "real: " << real << " "
+                       << "expect: " << rows[i].user_id;
+        }
+    }
+
+    engine_deinit(ctx);
 }
 int main() {
     test_revover(10, 10);
