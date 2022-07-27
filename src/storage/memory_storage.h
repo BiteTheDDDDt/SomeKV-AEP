@@ -21,7 +21,7 @@ public:
         user_id_index[create_from_string128(row.user_id)] = _datas.size();
 
         _datas.emplace_back(row);
-        if (_datas.size() % 100000 == 0) {
+        if (_datas.size() % 10000 == 0) {
             LOG(INFO) << "Write: " << _datas.size();
         }
     }
