@@ -21,6 +21,9 @@ public:
         user_id_index[create_from_string128(row.user_id)] = _datas.size();
 
         _datas.emplace_back(row);
+        if (_datas.size() % 100000 == 0) {
+            LOG(INFO) << "Write: " << _datas.size();
+        }
     }
 
     std::vector<size_t> get_selector(int32_t where_column, const void* column_key,
@@ -28,15 +31,15 @@ public:
         std::vector<size_t> selector;
 
         if (where_column == Schema::Column::Id) {
-            LOG(INFO) << "Read: Predicate(column_key=" << create_from_int64(column_key)
-                      << ", column_key_len=" << column_key_len << ")";
+            //LOG(INFO) << "Read: Predicate(column_key=" << create_from_int64(column_key)
+            //          << ", column_key_len=" << column_key_len << ")";
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
             selector.push_back(id_index[key_value]);
         }
 
         if (where_column == Schema::Column::Salary) {
-            LOG(INFO) << "Read: Predicate(column_key=" << create_from_int64(column_key)
-                      << ", column_key_len=" << column_key_len << ")";
+            //LOG(INFO) << "Read: Predicate(column_key=" << create_from_int64(column_key)
+            //          << ", column_key_len=" << column_key_len << ")";
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
             for (size_t i = 0; i < _datas.size(); ++i) {
                 if (_datas[i].salary == key_value) {
@@ -46,15 +49,15 @@ public:
         }
 
         if (where_column == Schema::Column::Userid) {
-            LOG(INFO) << "Read: Predicate(column_key=" << create_from_string128(column_key)
-                      << ", column_key_len=" << column_key_len << ")";
+            //LOG(INFO) << "Read: Predicate(column_key=" << create_from_string128(column_key)
+            //          << ", column_key_len=" << column_key_len << ")";
             auto key_value = create_from_string128(column_key);
             selector.push_back(user_id_index[key_value]);
         }
 
         if (where_column == Schema::Column::Name) {
-            LOG(INFO) << "Read: Predicate(column_key=" << create_from_string128(column_key)
-                      << ", column_key_len=" << column_key_len << ")";
+            //LOG(INFO) << "Read: Predicate(column_key=" << create_from_string128(column_key)
+            //          << ", column_key_len=" << column_key_len << ")";
             for (size_t i = 0; i < _datas.size(); ++i) {
                 if (memcmp(column_key, &_datas[i].name, column_key_len) == 0) {
                     selector.push_back(i);
