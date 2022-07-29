@@ -55,7 +55,7 @@ public:
                            << ", column_key_len=" << column_key_len << ")";
             }
             auto key_value = create_from_string128(column_key);
-            LOG(FATAL) << "Read: USERID Predicate(column_key=" << key_value
+            LOG(INFO) << "Read: USERID Predicate(column_key=" << key_value
                        << ", column_key_len=" << column_key_len << ")";
             selector.push_back(user_id_index[key_value]);
         }
