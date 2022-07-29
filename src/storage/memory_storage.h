@@ -49,8 +49,11 @@ public:
         }
 
         if (where_column == Schema::Column::Userid) {
-            //LOG(INFO) << "Read: Predicate(column_key=" << create_from_string128(column_key)
-            //          << ", column_key_len=" << column_key_len << ")";
+            if (column_key_len != Schema::USERID_LENGTH) {
+                LOG(FATAL) << "Read: Invalid Predicate(column_key="
+                           << create_from_string128(column_key)
+                           << ", column_key_len=" << column_key_len << ")";
+            }
             auto key_value = create_from_string128(column_key);
             selector.push_back(user_id_index[key_value]);
         }
@@ -64,7 +67,7 @@ public:
     }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
-                size_t column_key_len, void* res) {
+                size_t column_key_len, char* res) {
         auto selector = get_selector(where_column, column_key, column_key_len);
 
         size_t select_number = selector.size();
@@ -77,7 +80,7 @@ public:
             std::sort(data.begin(), data.end());
             for (auto i : data) {
                 memcpy(res, &i, Schema::ID_LENGTH);
-                res = (char*)res + Schema::ID_LENGTH;
+                res += Schema::ID_LENGTH;
             }
         }
 
@@ -89,7 +92,7 @@ public:
             std::sort(data.begin(), data.end());
             for (auto i : data) {
                 memcpy(res, &i, Schema::SALARY_LENGTH);
-                res = (char*)res + Schema::SALARY_LENGTH;
+                res += Schema::SALARY_LENGTH;
             }
         }
 
@@ -101,7 +104,7 @@ public:
             std::sort(data.begin(), data.end());
             for (auto i : data) {
                 memcpy(res, i.data(), Schema::USERID_LENGTH);
-                res = (char*)res + Schema::USERID_LENGTH;
+                res += Schema::USERID_LENGTH;
             }
         }
 
@@ -113,7 +116,7 @@ public:
             std::sort(data.begin(), data.end());
             for (auto i : data) {
                 memcpy(res, i.data(), Schema::NAME_LENGTH);
-                res = (char*)res + Schema::NAME_LENGTH;
+                res += Schema::NAME_LENGTH;
             }
         }
 

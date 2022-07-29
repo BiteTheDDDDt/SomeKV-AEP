@@ -36,7 +36,8 @@ public:
         //std::unique_lock lock(_mtx);
         LOG(INFO) << "Read: Query(select_column=" << select_column
                   << ", where_column=" << where_column << ")";
-        return _memtable.read(select_column, where_column, column_key, column_key_len, res);
+        return _memtable.read(select_column, where_column, column_key, column_key_len,
+                              static_cast<char*>(res));
     }
 
 private:
