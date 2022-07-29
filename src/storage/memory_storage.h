@@ -34,7 +34,9 @@ public:
             //LOG(INFO) << "Read: Predicate(column_key=" << create_from_int64(column_key)
             //          << ", column_key_len=" << column_key_len << ")";
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
-            selector.push_back(id_index[key_value]);
+            if (id_index.count(key_value)) {
+                selector.push_back(id_index[key_value]);
+            }
         }
 
         if (where_column == Schema::Column::Salary) {
@@ -56,8 +58,10 @@ public:
             }
             auto key_value = create_from_string128(column_key);
             LOG(INFO) << "Read: USERID Predicate(column_key=" << key_value
-                       << ", column_key_len=" << column_key_len << ")";
-            selector.push_back(user_id_index[key_value]);
+                      << ", column_key_len=" << column_key_len << ")";
+            if (user_id_index.count(key_value)) {
+                selector.push_back(user_id_index[key_value]);
+            }
         }
 
         if (where_column == Schema::Column::Name) {
