@@ -2,8 +2,12 @@
 
 #include "storage/storage_engine.h"
 #include "storage/storage_engine_factory.h"
+#include "utils/schema.h"
 
 void engine_write(void* ctx, const void* data, size_t len) {
+    if (len != Schema::ROW_LENGTH) {
+        LOG(FATAL) << "len!=ROW_LENGTH(len=" << len << ")";
+    }
     auto* engine = static_cast<StorageEngine*>(ctx);
     engine->write(data);
 }
