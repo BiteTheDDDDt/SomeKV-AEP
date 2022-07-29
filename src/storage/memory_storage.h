@@ -56,13 +56,8 @@ public:
         }
 
         if (where_column == Schema::Column::Name) {
-            //LOG(INFO) << "Read: Predicate(column_key=" << create_from_string128(column_key)
-            //          << ", column_key_len=" << column_key_len << ")";
-            for (size_t i = 0; i < _datas.size(); ++i) {
-                if (memcmp(column_key, &_datas[i].name, column_key_len) == 0) {
-                    selector.push_back(i);
-                }
-            }
+            LOG(FATAL) << "Read: Predicate(column_key=" << create_from_string128(column_key)
+                       << ", column_key_len=" << column_key_len << ")";
         }
 
         return selector;
@@ -73,7 +68,7 @@ public:
         auto selector = get_selector(where_column, column_key, column_key_len);
 
         size_t select_number = selector.size();
-        /*
+
         if (select_column == Schema::Column::Id) {
             std::vector<int64_t> data;
             for (auto i : selector) {
@@ -121,8 +116,8 @@ public:
                 res = (char*)res + Schema::NAME_LENGTH;
             }
         }
-*/
 
+        /*
         if (select_column == Schema::Column::Id) {
             for (auto i : selector) {
                 memcpy(res, &_datas[i].id, Schema::ID_LENGTH);
@@ -150,7 +145,7 @@ public:
                 res = (char*)res + Schema::NAME_LENGTH;
             }
         }
-
+*/
         LOG(INFO) << "Read: res_num=" << select_number << " " << vector_to_string(selector);
 
         return select_number;
