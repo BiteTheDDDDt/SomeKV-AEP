@@ -11,13 +11,20 @@
 class ReadableFile {
 public:
     ReadableFile(std::string path)
-            : _fd(open(path.data(), O_RDWR)), _size(get_file_size(path) / Schema::ROW_LENGTH) {}
+            : _fd(open(path.data(), O_RDWR)), _size(get_file_size(path) / Schema::ROW_LENGTH) {
+        LOG(INFO) << "Recover: _size=" << _size << ", get_file_size=" << get_file_size(path);
+        if (_size * Schema::ROW_LENGTH != get_file_size(path)) {
+            LOG(WARNING) << "Recover: file size not match, _size*Schema::ROW_LENGTH="
+                         << _size * Schema::ROW_LENGTH;
+            if (_size * Schema::ROW_LENGTH < get_file_size(path)) {
+                _size++;
+            }
+        }
+    }
 
     ~ReadableFile() { close(_fd); }
 
     MemoryStorage recover() {
-        LOG(INFO) << "Recover: _size=" << _size;
-
         MemoryStorage memtable;
 
         lseek(_fd, 0, SEEK_SET);
