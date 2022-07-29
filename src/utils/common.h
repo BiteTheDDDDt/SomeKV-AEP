@@ -48,7 +48,10 @@ inline int64_t create_from_int64(const void* address) {
 }
 
 inline std::string create_from_string128(const void* address) {
-    return std::string(static_cast<const char*>(address), 128);
+    std::string str;
+    str.resize(128);
+    memcpy(str.data(), address, 128);
+    return str;
 }
 
 inline bool equal(const Schema::Row& lhs, const Schema::Row& rhs) {
