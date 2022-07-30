@@ -13,6 +13,8 @@
 #include "utils/common.h"
 #include "utils/schema.h"
 
+constexpr int WRITE_LOG_TIMES = (1 << 20) - 1;
+
 class MemoryStorage {
 public:
     void write(const void* row_ptr) {
@@ -21,7 +23,7 @@ public:
         user_id_index[create_from_string128(row.user_id)] = _datas.size();
 
         _datas.emplace_back(row);
-        if ((_datas.size() & (1 << 20)) == (1 << 20)) {
+        if ((_datas.size() & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
             LOG(INFO) << "Write: " << _datas.size();
         }
     }
