@@ -21,9 +21,9 @@ public:
         user_id_index[create_from_string128(row.user_id)] = _datas.size();
 
         _datas.emplace_back(row);
-        //if (_datas.size() % 10000 == 0) {
-        //    LOG(INFO) << "Write: " << _datas.size();
-        //}
+        if ((_datas.size() & (1 << 20)) == (1 << 20)) {
+            LOG(INFO) << "Write: " << _datas.size();
+        }
     }
 
     std::vector<size_t> get_selector(int32_t where_column, const void* column_key,
@@ -155,7 +155,9 @@ public:
             }
         }
 */
-        LOG(INFO) << "Read: res_num=" << select_number << " " << vector_to_string(selector);
+        if (select_number > 1) {
+            LOG(INFO) << "Read: res_num=" << select_number << " " << vector_to_string(selector);
+        }
 
         return select_number;
     }
