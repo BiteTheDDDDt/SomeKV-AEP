@@ -21,9 +21,9 @@ public:
         user_id_index[create_from_string128(row.user_id)] = _datas.size();
 
         _datas.emplace_back(row);
-        if (_datas.size() % 10000 == 0) {
-            LOG(INFO) << "Write: " << _datas.size();
-        }
+        //if (_datas.size() % 10000 == 0) {
+        //    LOG(INFO) << "Write: " << _datas.size();
+        //}
     }
 
     std::vector<size_t> get_selector(int32_t where_column, const void* column_key,
@@ -57,8 +57,8 @@ public:
                            << ", column_key_len=" << column_key_len << ")";
             }
             auto key_value = create_from_string128(column_key);
-            LOG(INFO) << "Read: USERID Predicate(column_key=" << key_value
-                      << ", column_key_len=" << column_key_len << ")";
+            //LOG(INFO) << "Read: USERID Predicate(column_key=" << key_value
+            //          << ", column_key_len=" << column_key_len << ")";
             if (user_id_index.count(key_value)) {
                 selector.push_back(user_id_index[key_value]);
             }
