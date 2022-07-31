@@ -7,9 +7,9 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <unordered_map>
 #include <vector>
 
+#include "parallel_hashmap/phmap.h"
 #include "utils/common.h"
 #include "utils/schema.h"
 
@@ -32,8 +32,6 @@ public:
     std::vector<size_t> get_selector(int32_t where_column, const void* column_key,
                                      size_t column_key_len) {
         if (where_column == Schema::Column::Id) {
-            //LOG(INFO) << "Read: Predicate(column_key=" << create_from_int64(column_key)
-            //          << ", column_key_len=" << column_key_len << ")";
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
             if (id_index.count(key_value)) {
                 return {id_index[key_value]};
@@ -41,8 +39,6 @@ public:
         }
 
         if (where_column == Schema::Column::Salary) {
-            //LOG(INFO) << "Read: Predicate(column_key=" << create_from_int64(column_key)
-            //          << ", column_key_len=" << column_key_len << ")";
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
             if (salary_index.count(key_value)) {
                 return salary_index[key_value];
@@ -50,14 +46,7 @@ public:
         }
 
         if (where_column == Schema::Column::Userid) {
-            if (column_key_len != Schema::USERID_LENGTH) {
-                LOG(FATAL) << "Read: Invalid Predicate(column_key="
-                           << create_from_string128(column_key)
-                           << ", column_key_len=" << column_key_len << ")";
-            }
             auto key_value = create_from_string128(column_key);
-            //LOG(INFO) << "Read: USERID Predicate(column_key=" << key_value
-            //          << ", column_key_len=" << column_key_len << ")";
             if (user_id_index.count(key_value)) {
                 return {user_id_index[key_value]};
             }
@@ -74,8 +63,6 @@ public:
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, char* res) {
         auto selector = get_selector(where_column, column_key, column_key_len);
-
-        size_t select_number = selector.size();
 
         if (select_column == Schema::Column::Id) {
             std::vector<int64_t> data;
@@ -125,45 +112,12 @@ public:
             }
         }
 
-        /*
-        if (select_column == Schema::Column::Id) {
-            for (auto i : selector) {
-                memcpy(res, &_datas[i].id, Schema::ID_LENGTH);
-                res = (char*)res + Schema::ID_LENGTH;
-            }
-        }
-
-        if (select_column == Schema::Column::Salary) {
-            for (auto i : selector) {
-                memcpy(res, &_datas[i].salary, Schema::SALARY_LENGTH);
-                res = (char*)res + Schema::SALARY_LENGTH;
-            }
-        }
-
-        if (select_column == Schema::Column::Userid) {
-            for (auto i : selector) {
-                memcpy(res, &_datas[i].user_id, Schema::USERID_LENGTH);
-                res = (char*)res + Schema::USERID_LENGTH;
-            }
-        }
-
-        if (select_column == Schema::Column::Name) {
-            for (auto i : selector) {
-                memcpy(res, &_datas[i].name, Schema::NAME_LENGTH);
-                res = (char*)res + Schema::NAME_LENGTH;
-            }
-        }
-*/
-        if (select_number > 1) {
-            LOG(INFO) << "Read: res_num=" << select_number << " " << vector_to_string(selector);
-        }
-
-        return select_number;
+        return selector.size();
     }
 
 private:
-    std::unordered_map<int64_t, size_t> id_index;
-    std::unordered_map<std::string, size_t> user_id_index;
-    std::unordered_map<int64_t, std::vector<size_t>> salary_index;
+    phmap::parallel_flat_hash_map<int64_t, size_t> id_index;
+    phmap::parallel_flat_hash_map<std::string, size_t> user_id_index;
+    phmap::parallel_flat_hash_map<int64_t, std::vector<size_t>> salary_index;
     std::vector<Schema::Row> _datas;
 };
