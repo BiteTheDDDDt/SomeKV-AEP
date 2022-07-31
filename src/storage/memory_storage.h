@@ -21,6 +21,7 @@ public:
         Schema::Row row = create_from_address(row_ptr);
         id_index[row.id] = _datas.size();
         user_id_index[create_from_string128(row.user_id)] = _datas.size();
+        salary_index[row.salary].emplace_back(_datas.size());
 
         _datas.emplace_back(row);
         if ((_datas.size() & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
@@ -30,14 +31,12 @@ public:
 
     std::vector<size_t> get_selector(int32_t where_column, const void* column_key,
                                      size_t column_key_len) {
-        std::vector<size_t> selector;
-
         if (where_column == Schema::Column::Id) {
             //LOG(INFO) << "Read: Predicate(column_key=" << create_from_int64(column_key)
             //          << ", column_key_len=" << column_key_len << ")";
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
             if (id_index.count(key_value)) {
-                selector.push_back(id_index[key_value]);
+                return {id_index[key_value]};
             }
         }
 
@@ -45,10 +44,8 @@ public:
             //LOG(INFO) << "Read: Predicate(column_key=" << create_from_int64(column_key)
             //          << ", column_key_len=" << column_key_len << ")";
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
-            for (size_t i = 0; i < _datas.size(); ++i) {
-                if (_datas[i].salary == key_value) {
-                    selector.push_back(i);
-                }
+            if (salary_index.count(key_value)) {
+                return salary_index[key_value];
             }
         }
 
@@ -62,7 +59,7 @@ public:
             //LOG(INFO) << "Read: USERID Predicate(column_key=" << key_value
             //          << ", column_key_len=" << column_key_len << ")";
             if (user_id_index.count(key_value)) {
-                selector.push_back(user_id_index[key_value]);
+                return {user_id_index[key_value]};
             }
         }
 
@@ -71,7 +68,7 @@ public:
                        << ", column_key_len=" << column_key_len << ")";
         }
 
-        return selector;
+        return {};
     }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
@@ -167,5 +164,6 @@ public:
 private:
     std::unordered_map<int64_t, size_t> id_index;
     std::unordered_map<std::string, size_t> user_id_index;
+    std::unordered_map<int64_t, std::vector<size_t>> salary_index;
     std::vector<Schema::Row> _datas;
 };
