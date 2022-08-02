@@ -10,7 +10,7 @@
 
 class ReadableFile {
 public:
-    ReadableFile(std::string path)
+    ReadableFile(const std::string& path)
             : _fd(open(path.data(), O_RDWR)), _size(get_file_size(path) / Schema::ROW_LENGTH) {
         LOG(INFO) << "Recover: _size=" << _size << ", get_file_size=" << get_file_size(path);
         if (_size * Schema::ROW_LENGTH != get_file_size(path)) {
@@ -24,9 +24,7 @@ public:
 
     ~ReadableFile() { close(_fd); }
 
-    MemoryStorage recover() {
-        MemoryStorage memtable;
-
+    void recover(MemoryStorage& memtable) {
         lseek(_fd, 0, SEEK_SET);
 
         for (size_t i = 0; i < _size; i += READ_FILE_BUFFER_SIZE) {
@@ -38,8 +36,6 @@ public:
                 memtable.write(_buffer + j * Schema::ROW_LENGTH);
             }
         }
-
-        return memtable;
     }
 
 private:

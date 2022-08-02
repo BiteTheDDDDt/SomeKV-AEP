@@ -13,6 +13,8 @@ constexpr const size_t READ_FILE_BUFFER_SIZE = 1;
 
 constexpr const size_t WRITE_FILE_BUFFER_SIZE = 1;
 
+constexpr size_t BUCKET_NUMBER = (1 << 5) - 1;
+
 inline uint64_t get_file_size(std::string path) {
     struct ::stat file_stat;
     if (stat(path.data(), &file_stat) != 0) {

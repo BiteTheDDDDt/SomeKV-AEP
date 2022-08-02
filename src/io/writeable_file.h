@@ -9,7 +9,7 @@
 
 class WriteableFile {
 public:
-    WriteableFile(std::string path) : _fp(fopen(path.data(), "ab")) {}
+    WriteableFile(const std::string& path) : _fp(fopen(path.data(), "ab")) {}
 
     ~WriteableFile() { fclose(_fp); }
 
