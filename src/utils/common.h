@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "utils/schema.h"
@@ -54,6 +55,10 @@ inline std::string create_from_string128(const void* address) {
     str.resize(128);
     memcpy(str.data(), address, 128);
     return str;
+}
+
+inline std::string_view create_from_string128_ref(const void* address) {
+    return std::string_view(static_cast<const char*>(address), 128);
 }
 
 inline bool equal(const Schema::Row& lhs, const Schema::Row& rhs) {

@@ -7,7 +7,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <vector>
+#include <list>
+#include <string_view>
 
 #include "parallel_hashmap/phmap.h"
 #include "utils/common.h"
@@ -18,12 +19,18 @@ constexpr int WRITE_LOG_TIMES = (1 << 20) - 1;
 class MemoryStorage {
 public:
     void write(const void* row_ptr) {
+        size_t offset = _datas.size();
         Schema::Row row = create_from_address(row_ptr);
-        id_index[row.id] = _datas.size();
-        user_id_index[create_from_string128(row.user_id)] = _datas.size();
-        salary_index[row.salary].emplace_back(_datas.size());
-
         _datas.emplace_back(row);
+
+        id_index.try_emplace_l(
+                row.id, [](const auto&) {}, offset);
+        user_id_index.try_emplace_l(
+                create_from_string128_ref(row.user_id), [](const auto&) {}, offset);
+        salary_index.try_emplace_l(
+                row.salary, [offset](auto& v) { v.second.emplace_back(offset); },
+                std::list<size_t> {offset});
+
         if ((_datas.size() & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
             LOG(INFO) << "Write: " << _datas.size();
         }
@@ -32,13 +39,14 @@ public:
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, char* res) {
         auto selector = get_selector(where_column, column_key, column_key_len);
+        size_t size = selector.size();
 
-        if (selector.size() == 1) {
-            read_single(select_column, res, selector[0]);
-        } else {
+        if (size > 1) {
             read_multiple(select_column, res, selector);
+        } else if (size == 1) {
+            read_single(select_column, res, *selector.begin());
         }
-        return selector.size();
+        return size;
     }
 
 private:
@@ -63,7 +71,7 @@ private:
             res += Schema::NAME_LENGTH;
         }
     }
-    void read_multiple(int32_t select_column, char* res, const std::vector<size_t>& selector) {
+    void read_multiple(int32_t select_column, char* res, const std::list<size_t>& selector) {
         if (select_column == Schema::Column::Id) {
             std::vector<int64_t> data;
             for (auto i : selector) {
@@ -113,8 +121,8 @@ private:
         }
     }
 
-    std::vector<size_t> get_selector(int32_t where_column, const void* column_key,
-                                     size_t column_key_len) {
+    std::list<size_t> get_selector(int32_t where_column, const void* column_key,
+                                   size_t column_key_len) {
         if (where_column == Schema::Column::Id) {
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
             if (id_index.count(key_value)) {
@@ -130,7 +138,7 @@ private:
         }
 
         if (where_column == Schema::Column::Userid) {
-            auto key_value = create_from_string128(column_key);
+            std::string_view key_value = create_from_string128_ref(column_key);
             if (user_id_index.count(key_value)) {
                 return {user_id_index[key_value]};
             }
@@ -145,7 +153,7 @@ private:
     }
 
     phmap::parallel_flat_hash_map<int64_t, size_t> id_index;
-    phmap::parallel_flat_hash_map<std::string, size_t> user_id_index;
-    phmap::parallel_flat_hash_map<int64_t, std::vector<size_t>> salary_index;
+    phmap::parallel_flat_hash_map<std::string_view, size_t> user_id_index;
+    phmap::parallel_flat_hash_map<int64_t, std::list<size_t>> salary_index;
     std::vector<Schema::Row> _datas;
 };
