@@ -19,6 +19,7 @@ constexpr int WRITE_LOG_TIMES = (1 << 20) - 1;
 class MemoryStorage {
 public:
     void write(const void* row_ptr) {
+        std::unique_lock lock(_mtx);
         size_t offset = _datas.size();
         Schema::Row row = create_from_address(row_ptr);
         _datas.emplace_back(row);
@@ -149,4 +150,5 @@ private:
     phmap::parallel_flat_hash_map<std::string, size_t> user_id_index;
     phmap::parallel_flat_hash_map<int64_t, std::list<size_t>> salary_index;
     std::vector<Schema::Row> _datas;
+    std::mutex _mtx;
 };
