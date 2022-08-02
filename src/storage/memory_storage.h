@@ -26,7 +26,7 @@ public:
         id_index.try_emplace_l(
                 row.id, [](const auto&) {}, offset);
         user_id_index.try_emplace_l(
-                create_from_string128_ref(row.user_id), [](const auto&) {}, offset);
+                create_from_string128(row.user_id), [](const auto&) {}, offset);
         salary_index.try_emplace_l(
                 row.salary, [offset](auto& v) { v.second.emplace_back(offset); },
                 std::list<size_t> {offset});
@@ -123,37 +123,30 @@ private:
 
     std::list<size_t> get_selector(int32_t where_column, const void* column_key,
                                    size_t column_key_len) {
+        std::list<size_t> selector;
         if (where_column == Schema::Column::Id) {
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
-            if (id_index.count(key_value)) {
-                return {id_index[key_value]};
-            }
+            id_index.if_contains(key_value,
+                                 [&selector](const auto& v) { selector.emplace_back(v.second); });
         }
 
         if (where_column == Schema::Column::Salary) {
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
-            if (salary_index.count(key_value)) {
-                return salary_index[key_value];
-            }
+            salary_index.if_contains(key_value,
+                                     [&selector](const auto& v) { selector = v.second; });
         }
 
         if (where_column == Schema::Column::Userid) {
             std::string_view key_value = create_from_string128_ref(column_key);
-            if (user_id_index.count(key_value)) {
-                return {user_id_index[key_value]};
-            }
+            user_id_index.if_contains(
+                    key_value, [&selector](const auto& v) { selector.emplace_back(v.second); });
         }
 
-        if (where_column == Schema::Column::Name) {
-            LOG(FATAL) << "Read: Predicate(column_key=" << create_from_string128(column_key)
-                       << ", column_key_len=" << column_key_len << ")";
-        }
-
-        return {};
+        return selector;
     }
 
     phmap::parallel_flat_hash_map<int64_t, size_t> id_index;
-    phmap::parallel_flat_hash_map<std::string_view, size_t> user_id_index;
+    phmap::parallel_flat_hash_map<std::string, size_t> user_id_index;
     phmap::parallel_flat_hash_map<int64_t, std::list<size_t>> salary_index;
     std::vector<Schema::Row> _datas;
 };
