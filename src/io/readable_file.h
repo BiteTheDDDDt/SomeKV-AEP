@@ -11,7 +11,7 @@
 class ReadableFile {
 public:
     ReadableFile(const std::string& path)
-            : _fd(open(path.data(), O_RDWR)), _size(get_file_size(path) / Schema::ROW_LENGTH) {
+            : _fd(open(path.data(), O_RDONLY)), _size(get_file_size(path) / Schema::ROW_LENGTH) {
         LOG(INFO) << "Recover: _size=" << _size << ", get_file_size=" << get_file_size(path);
         if (_size * Schema::ROW_LENGTH != get_file_size(path)) {
             LOG(WARNING) << "Recover: file size not match, _size*Schema::ROW_LENGTH="
