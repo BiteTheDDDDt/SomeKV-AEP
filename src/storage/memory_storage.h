@@ -18,14 +18,12 @@ constexpr int WRITE_LOG_TIMES = (1 << 20) - 1;
 
 class MemoryStorage {
 public:
-    void write(const void* row_ptr) {
+    void write(const Schema::Row* row) {
         size_t offset = 0;
-        const Schema::Row* row = create_from_address_ref(row_ptr);
-        {
-            std::unique_lock lock(_mtx);
-            offset = _datas.size();
-            _datas.emplace_back(*row);
-        }
+
+        std::unique_lock lock(_mtx);
+        offset = _datas.size();
+        _datas.emplace_back(*row);
 
         id_index.try_emplace_l(
                 row->id, [](const auto&) {}, offset);

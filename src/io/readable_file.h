@@ -33,7 +33,7 @@ public:
                     pread(_fd, _buffer, limit * Schema::ROW_LENGTH, i * Schema::ROW_LENGTH);
 
             for (int j = 0; j < limit; j++) {
-                memtable.write(_buffer + j * Schema::ROW_LENGTH);
+                memtable.write(create_from_address_ref(_buffer + j * Schema::ROW_LENGTH));
             }
         }
     }
