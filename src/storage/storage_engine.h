@@ -19,6 +19,7 @@ public:
             : _storage_path(disk_dir + WAL_PATH_SUFFIX) {
         for (size_t i = 0; i < BUCKET_NUMBER; i++) {
             std::string sub_path = _storage_path + "." + std::to_string(i);
+            fsync(open(sub_path.data(), O_RDWR));
             ReadableFile(sub_path).recover(_memtable);
             _wal[i] = new DiskStorage(sub_path);
         }
