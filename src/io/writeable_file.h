@@ -16,7 +16,6 @@ public:
 
     void append(const void* data_ptr) {
         [[maybe_unused]] auto res = write(_fd, data_ptr, Schema::ROW_LENGTH);
-        fsync(_fd);
     }
 
 private:
