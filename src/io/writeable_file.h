@@ -9,16 +9,15 @@
 
 class WriteableFile {
 public:
-    WriteableFile(const std::string& path) : _fp(fopen(path.data(), "ab")) {}
+    WriteableFile(const std::string& path)
+            : _fd(open(path.data(), O_APPEND | O_WRONLY | O_CREAT, 0644)) {}
 
-    ~WriteableFile() { fclose(_fp); }
+    ~WriteableFile() { close(_fd); }
 
     void append(const void* data_ptr) {
-        [[maybe_unused]] auto res = fwrite(data_ptr, 1, Schema::ROW_LENGTH, _fp);
-        // sync();
+        [[maybe_unused]] auto res = write(_fd, data_ptr, Schema::ROW_LENGTH);
     }
-    void sync() { [[maybe_unused]] auto res = fflush(_fp); }
 
 private:
-    FILE* _fp;
+    int _fd;
 };

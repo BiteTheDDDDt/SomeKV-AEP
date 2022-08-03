@@ -12,7 +12,7 @@
 const char* AEP_DIR = "storage/aep/";
 const char* DISK_DIR = "storage/disk/";
 
-void test_revover(size_t row_number_stage1, size_t row_number_stage2) {
+void test_recover(size_t row_number_stage1, size_t row_number_stage2) {
     std::vector<Schema::Row> rows;
     rows.resize(row_number_stage1 + row_number_stage2);
     int64_t salary = 6;
@@ -130,7 +130,7 @@ void test_revover(size_t row_number_stage1, size_t row_number_stage2) {
     engine_deinit(ctx);
 }
 int main() {
-    test_revover(10, 10);
+    test_recover(10, 10);
 
     LOG(INFO) << "pass all check";
     return 0;
