@@ -19,17 +19,20 @@ constexpr int WRITE_LOG_TIMES = (1 << 20) - 1;
 class MemoryStorage {
 public:
     void write(const void* row_ptr) {
-        std::unique_lock lock(_mtx);
-        size_t offset = _datas.size();
-        Schema::Row row = create_from_address(row_ptr);
-        _datas.emplace_back(row);
+        size_t offset = 0;
+        const Schema::Row* row = create_from_address_ref(row_ptr);
+        {
+            std::unique_lock lock(_mtx);
+            offset = _datas.size();
+            _datas.emplace_back(*row);
+        }
 
         id_index.try_emplace_l(
-                row.id, [](const auto&) {}, offset);
+                row->id, [](const auto&) {}, offset);
         user_id_index.try_emplace_l(
-                create_from_string128(row.user_id), [](const auto&) {}, offset);
+                create_from_string128(row->user_id), [](const auto&) {}, offset);
         salary_index.try_emplace_l(
-                row.salary, [offset](auto& v) { v.second.emplace_back(offset); },
+                row->salary, [offset](auto& v) { v.second.emplace_back(offset); },
                 std::list<size_t> {offset});
 
         if ((_datas.size() & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {

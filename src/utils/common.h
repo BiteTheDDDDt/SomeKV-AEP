@@ -15,7 +15,7 @@ constexpr const size_t READ_FILE_BUFFER_SIZE = 1;
 constexpr const size_t WRITE_FILE_BUFFER_SIZE = 1;
 
 constexpr size_t BUCKET_NUMBER = (1 << 5);
-constexpr size_t BUCKET_NUMBER_MASK = (1 << 5)-1;
+constexpr size_t BUCKET_NUMBER_MASK = (1 << 5) - 1;
 
 inline uint64_t get_file_size(std::string path) {
     struct ::stat file_stat;
@@ -56,6 +56,10 @@ inline std::string create_from_string128(const void* address) {
     str.resize(128);
     memcpy(str.data(), address, 128);
     return str;
+}
+
+inline const Schema::Row* create_from_address_ref(const void* address) {
+    return static_cast<const Schema::Row*>(address);
 }
 
 inline std::string_view create_from_string128_ref(const void* address) {
