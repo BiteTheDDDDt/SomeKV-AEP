@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <list>
+#include <forward_list>
 #include <string_view>
 
 #include "parallel_hashmap/phmap.h"
@@ -17,7 +17,7 @@
 constexpr int WRITE_LOG_TIMES = (1 << 20) - 1;
 
 class MemoryStorage {
-    using Container = std::list<Schema::Row>;
+    using Container = std::forward_list<Schema::Row>;
     using Iterator = Container::iterator;
     using Selector = std::vector<Iterator>;
     using Mutex = std::mutex;
@@ -25,8 +25,8 @@ class MemoryStorage {
 public:
     void write(const Schema::Row* row) {
         std::unique_lock lock(_mtx);
-        _datas.emplace_back(*row);
-        auto it = --_datas.end();
+        _datas.push_front(*row);
+        auto it = _datas.begin();
 
         id_index.lazy_emplace_l(
                 row->id, [](const auto&) {}, [&row, &it](const auto& ctor) { ctor(row->id, it); });
@@ -40,14 +40,13 @@ public:
                 row->salary, [it](auto& v) { v.second.emplace_back(it); },
                 [&row, &it](const auto& ctor) { ctor(row->salary, Selector {it}); });
 
-        if ((_datas.size() & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
-            LOG(INFO) << "Write: " << _datas.size();
+        if (((++_size) & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
+            LOG(INFO) << "Write: " << _size;
         }
     }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, char* res) {
-        std::unique_lock lock(_mtx);
         auto selector = get_selector(where_column, column_key, column_key_len);
         size_t size = selector.size();
 
@@ -159,4 +158,5 @@ private:
     phmap::parallel_flat_hash_map<int64_t, Selector> salary_index;
     Container _datas;
     Mutex _mtx;
+    int _size = 0;
 };
