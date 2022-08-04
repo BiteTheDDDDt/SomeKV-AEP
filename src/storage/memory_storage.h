@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <forward_list>
+#include <list>
 #include <string_view>
 
 #include "parallel_hashmap/phmap.h"
@@ -17,9 +17,9 @@
 constexpr int WRITE_LOG_TIMES = (1 << 20) - 1;
 
 class MemoryStorage {
-    using Container = std::forward_list<Schema::Row>;
+    using Container = std::list<Schema::Row>;
     using Iterator = Container::iterator;
-    using Selector = std::vector<Iterator>;
+    using Selector = std::list<Iterator>;
     using Mutex = std::mutex;
 
 public:
