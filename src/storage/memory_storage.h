@@ -28,12 +28,17 @@ public:
         _datas.emplace_back(*row);
         auto it = --_datas.end();
 
-        id_index.try_emplace_l(
-                row->id, [](const auto&) {}, it);
-        user_id_index.try_emplace_l(
-                create_from_string128_ref(row->user_id), [](const auto&) {}, it);
-        salary_index.try_emplace_l(
-                row->salary, [it](auto& v) { v.second.emplace_back(it); }, Selector {it});
+        id_index.lazy_emplace_l(
+                row->id, [](const auto&) {}, [&row, &it](const auto& ctor) { ctor(row->id, it); });
+
+        auto user_id = create_from_string128_ref(row->user_id);
+        user_id_index.lazy_emplace_l(
+                user_id, [](const auto&) {},
+                [&user_id, &it](const auto& ctor) { ctor(user_id, it); });
+
+        salary_index.lazy_emplace_l(
+                row->salary, [it](auto& v) { v.second.emplace_back(it); },
+                [&row, &it](const auto& ctor) { ctor(row->salary, Selector {it}); });
 
         if ((_datas.size() & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
             LOG(INFO) << "Write: " << _datas.size();
