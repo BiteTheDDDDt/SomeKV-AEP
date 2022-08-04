@@ -47,6 +47,7 @@ public:
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, char* res) {
+        std::unique_lock lock(_mtx);
         auto selector = get_selector(where_column, column_key, column_key_len);
         size_t size = selector.size();
 
