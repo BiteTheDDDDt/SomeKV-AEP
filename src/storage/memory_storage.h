@@ -17,21 +17,23 @@
 constexpr int WRITE_LOG_TIMES = (1 << 20) - 1;
 
 class MemoryStorage {
+    using Container = std::list<Schema::Row>;
+    using Iterator = Container::iterator;
+    using Selector = std::vector<Iterator>;
+    using Mutex = std::mutex;
+
 public:
     void write(const Schema::Row* row) {
-        size_t offset = 0;
-
         std::unique_lock lock(_mtx);
-        offset = _datas.size();
         _datas.emplace_back(*row);
+        auto it = --_datas.end();
 
         id_index.try_emplace_l(
-                row->id, [](const auto&) {}, offset);
+                row->id, [](const auto&) {}, it);
         user_id_index.try_emplace_l(
-                create_from_string128(row->user_id), [](const auto&) {}, offset);
+                create_from_string128_ref(row->user_id), [](const auto&) {}, it);
         salary_index.try_emplace_l(
-                row->salary, [offset](auto& v) { v.second.emplace_back(offset); },
-                std::list<size_t> {offset});
+                row->salary, [it](auto& v) { v.second.emplace_back(it); }, Selector {it});
 
         if ((_datas.size() & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
             LOG(INFO) << "Write: " << _datas.size();
@@ -52,32 +54,32 @@ public:
     }
 
 private:
-    void read_single(int32_t select_column, char* res, size_t selector) {
+    void read_single(int32_t select_column, char* res, Iterator iterator) {
         if (select_column == Schema::Column::Id) {
-            memcpy(res, &_datas[selector].id, Schema::ID_LENGTH);
+            memcpy(res, &iterator->id, Schema::ID_LENGTH);
             res += Schema::ID_LENGTH;
         }
 
         if (select_column == Schema::Column::Salary) {
-            memcpy(res, &_datas[selector].salary, Schema::SALARY_LENGTH);
+            memcpy(res, &iterator->salary, Schema::SALARY_LENGTH);
             res += Schema::SALARY_LENGTH;
         }
 
         if (select_column == Schema::Column::Userid) {
-            memcpy(res, _datas[selector].user_id, Schema::USERID_LENGTH);
+            memcpy(res, iterator->user_id, Schema::USERID_LENGTH);
             res += Schema::USERID_LENGTH;
         }
 
         if (select_column == Schema::Column::Name) {
-            memcpy(res, _datas[selector].name, Schema::NAME_LENGTH);
+            memcpy(res, iterator->name, Schema::NAME_LENGTH);
             res += Schema::NAME_LENGTH;
         }
     }
-    void read_multiple(int32_t select_column, char* res, const std::list<size_t>& selector) {
+    void read_multiple(int32_t select_column, char* res, const Selector& selector) {
         if (select_column == Schema::Column::Id) {
             std::vector<int64_t> data;
-            for (auto i : selector) {
-                data.emplace_back(_datas[i].id);
+            for (auto iterator : selector) {
+                data.emplace_back(iterator->id);
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
@@ -88,8 +90,8 @@ private:
 
         if (select_column == Schema::Column::Salary) {
             std::vector<int64_t> data;
-            for (auto i : selector) {
-                data.emplace_back(_datas[i].salary);
+            for (auto iterator : selector) {
+                data.emplace_back(iterator->salary);
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
@@ -99,9 +101,9 @@ private:
         }
 
         if (select_column == Schema::Column::Userid) {
-            std::vector<std::string> data;
-            for (auto i : selector) {
-                data.emplace_back(create_from_string128(_datas[i].user_id));
+            std::vector<std::string_view> data;
+            for (auto iterator : selector) {
+                data.emplace_back(create_from_string128_ref(iterator->user_id));
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
@@ -111,9 +113,9 @@ private:
         }
 
         if (select_column == Schema::Column::Name) {
-            std::vector<std::string> data;
-            for (auto i : selector) {
-                data.emplace_back(create_from_string128(_datas[i].name));
+            std::vector<std::string_view> data;
+            for (auto iterator : selector) {
+                data.emplace_back(create_from_string128_ref(iterator->name));
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
@@ -123,9 +125,8 @@ private:
         }
     }
 
-    std::list<size_t> get_selector(int32_t where_column, const void* column_key,
-                                   size_t column_key_len) {
-        std::list<size_t> selector;
+    Selector get_selector(int32_t where_column, const void* column_key, size_t column_key_len) {
+        Selector selector;
         if (where_column == Schema::Column::Id) {
             const int64_t key_value = *static_cast<const int64_t*>(column_key);
             id_index.if_contains(key_value,
@@ -147,9 +148,9 @@ private:
         return selector;
     }
 
-    phmap::parallel_flat_hash_map<int64_t, size_t> id_index;
-    phmap::parallel_flat_hash_map<std::string, size_t> user_id_index;
-    phmap::parallel_flat_hash_map<int64_t, std::list<size_t>> salary_index;
-    std::vector<Schema::Row> _datas;
-    std::mutex _mtx;
+    phmap::parallel_flat_hash_map<int64_t, Iterator> id_index;
+    phmap::parallel_flat_hash_map<std::string_view, Iterator> user_id_index;
+    phmap::parallel_flat_hash_map<int64_t, Selector> salary_index;
+    Container _datas;
+    Mutex _mtx;
 };
