@@ -16,9 +16,6 @@ public:
         if (_size * Schema::ROW_LENGTH != get_file_size(path)) {
             LOG(WARNING) << "Recover: file size not match, _size*Schema::ROW_LENGTH="
                          << _size * Schema::ROW_LENGTH;
-            if (_size * Schema::ROW_LENGTH < get_file_size(path)) {
-                _size++;
-            }
         }
     }
 

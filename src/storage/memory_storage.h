@@ -31,7 +31,7 @@ public:
         id_index.lazy_emplace_l(
                 row->id, [](const auto&) {}, [&row, &it](const auto& ctor) { ctor(row->id, it); });
 
-        auto user_id = create_from_string128_ref(row->user_id);
+        auto user_id = create_from_string128(row->user_id);
         user_id_index.lazy_emplace_l(
                 user_id, [](const auto&) {},
                 [&user_id, &it](const auto& ctor) { ctor(user_id, it); });
@@ -80,6 +80,7 @@ private:
             res += Schema::NAME_LENGTH;
         }
     }
+
     void read_multiple(int32_t select_column, char* res, const Selector& selector) {
         if (select_column == Schema::Column::Id) {
             std::vector<int64_t> data;
@@ -106,9 +107,9 @@ private:
         }
 
         if (select_column == Schema::Column::Userid) {
-            std::vector<std::string_view> data;
+            std::vector<std::string> data;
             for (auto iterator : selector) {
-                data.emplace_back(create_from_string128_ref(iterator->user_id));
+                data.emplace_back(create_from_string128(iterator->user_id));
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
@@ -118,9 +119,9 @@ private:
         }
 
         if (select_column == Schema::Column::Name) {
-            std::vector<std::string_view> data;
+            std::vector<std::string> data;
             for (auto iterator : selector) {
-                data.emplace_back(create_from_string128_ref(iterator->name));
+                data.emplace_back(create_from_string128(iterator->name));
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
@@ -145,7 +146,7 @@ private:
         }
 
         if (where_column == Schema::Column::Userid) {
-            std::string_view key_value = create_from_string128_ref(column_key);
+            std::string key_value = create_from_string128(column_key);
             user_id_index.if_contains(
                     key_value, [&selector](const auto& v) { selector.emplace_back(v.second); });
         }
@@ -154,7 +155,7 @@ private:
     }
 
     phmap::parallel_flat_hash_map<int64_t, Iterator> id_index;
-    phmap::parallel_flat_hash_map<std::string_view, Iterator> user_id_index;
+    phmap::parallel_flat_hash_map<std::string, Iterator> user_id_index;
     phmap::parallel_flat_hash_map<int64_t, Selector> salary_index;
     Container _datas;
     Mutex _mtx;
