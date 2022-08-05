@@ -14,7 +14,7 @@
 #include "utils/common.h"
 #include "utils/schema.h"
 
-constexpr int WRITE_LOG_TIMES = (1 << 23) - 1;
+constexpr int WRITE_LOG_TIMES = (1 << 24) - 1;
 
 class MemoryStorage {
     using Container = std::list<Schema::Row>;
@@ -24,9 +24,18 @@ class MemoryStorage {
 
 public:
     void write(const Schema::Row* row) {
-        std::unique_lock lock(_mtx);
-        _datas.push_front(*row);
-        auto it = _datas.begin();
+        Iterator it;
+        {
+            std::unique_lock lock(_mtx);
+            _datas.push_front(*row);
+            it = _datas.begin();
+            if (((++_size) & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
+                LOG(INFO) << "Write: " << _size;
+                print_meminfo();
+                sync();
+                print_meminfo();
+            }
+        }
 
         id_index.lazy_emplace_l(
                 row->id, [](const auto&) {}, [&row, &it](const auto& ctor) { ctor(row->id, it); });
@@ -39,13 +48,6 @@ public:
         salary_index.lazy_emplace_l(
                 row->salary, [it](auto& v) { v.second.emplace_back(it); },
                 [&row, &it](const auto& ctor) { ctor(row->salary, Selector {it}); });
-
-        if (((++_size) & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
-            LOG(INFO) << "Write: " << _size;
-            print_meminfo();
-            sync();
-            print_meminfo();
-        }
     }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
