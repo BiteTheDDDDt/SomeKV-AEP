@@ -21,13 +21,17 @@ class MemoryStorage {
     using Iterator = Container::iterator;
     using Selector = std::list<Iterator>;
     using Mutex = std::mutex;
+    template <typename K, typename V>
+    using ParallelMap =
+            phmap::parallel_flat_hash_map<K, V, phmap::Hash<K>, phmap::EqualTo<K>,
+                                          std::allocator<std::pair<const K, V>>, 4UL, std::mutex>;
 
 public:
     void write(const Schema::Row* row) {
         Iterator it;
         {
             std::unique_lock lock(_mtx);
-            _datas.push_front(*row);
+            _datas.emplace_front(*row);
             it = _datas.begin();
             if (((++_size) & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
                 LOG(INFO) << "Write: " << _size;
@@ -156,9 +160,9 @@ private:
         return selector;
     }
 
-    phmap::parallel_flat_hash_map<int64_t, Iterator> id_index;
-    phmap::parallel_flat_hash_map<std::string, Iterator> user_id_index;
-    phmap::parallel_flat_hash_map<int64_t, Selector> salary_index;
+    ParallelMap<int64_t, Iterator> id_index;
+    ParallelMap<std::string, Iterator> user_id_index;
+    ParallelMap<int64_t, Selector> salary_index;
     Container _datas;
     Mutex _mtx;
     int _size = 0;
