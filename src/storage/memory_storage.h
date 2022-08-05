@@ -33,11 +33,6 @@ public:
             std::unique_lock lock(_mtx);
             _datas.emplace_front(*row);
             it = _datas.begin();
-            if (((++_size) & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
-                LOG(INFO) << "Write: " << _size;
-                sync();
-                print_meminfo();
-            }
         }
 
         id_index.try_emplace_l(
@@ -48,6 +43,12 @@ public:
 
         salary_index.try_emplace_l(
                 row->salary, [it](auto& v) { v.second.emplace_back(it); }, Selector {it});
+
+        if (((++_size) & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
+            LOG(INFO) << "Write: " << _size;
+            sync();
+            print_meminfo();
+        }
     }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
@@ -164,5 +165,5 @@ private:
     ParallelMap<int64_t, Selector> salary_index;
     Container _datas;
     Mutex _mtx;
-    int _size = 0;
+    std::atomic<uint64_t> _size = 0;
 };
