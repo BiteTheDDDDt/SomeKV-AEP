@@ -37,17 +37,14 @@ public:
             }
         }
 
-        id_index.lazy_emplace_l(
-                row->id, [](const auto&) {}, [&row, &it](const auto& ctor) { ctor(row->id, it); });
+        id_index.try_emplace_l(
+                row->id, [](const auto&) {}, it);
 
-        auto user_id = create_from_string128(row->user_id);
-        user_id_index.lazy_emplace_l(
-                user_id, [](const auto&) {},
-                [&user_id, &it](const auto& ctor) { ctor(user_id, it); });
+        user_id_index.try_emplace_l(
+                create_from_string128(row->user_id), [](const auto&) {}, it);
 
-        salary_index.lazy_emplace_l(
-                row->salary, [it](auto& v) { v.second.emplace_back(it); },
-                [&row, &it](const auto& ctor) { ctor(row->salary, Selector {it}); });
+        salary_index.try_emplace_l(
+                row->salary, [it](auto& v) { v.second.emplace_back(it); }, Selector {it});
     }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
