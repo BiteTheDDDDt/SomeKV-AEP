@@ -14,7 +14,7 @@
 #include "utils/common.h"
 #include "utils/schema.h"
 
-constexpr int WRITE_LOG_TIMES = (1 << 24) - 1;
+constexpr int WRITE_LOG_TIMES = (1 << 22) - 1;
 
 class MemoryStorage {
     using Container = std::list<Schema::Row>;
@@ -35,7 +35,6 @@ public:
             it = _datas.begin();
             if (((++_size) & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
                 LOG(INFO) << "Write: " << _size;
-                print_meminfo();
                 sync();
                 print_meminfo();
             }

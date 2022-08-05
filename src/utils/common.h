@@ -80,6 +80,6 @@ inline void print_meminfo() {
         fprintf(stdout, "%s", buffer);
         result += buffer;
     }
-    LOG(INFO) << result;
+    LOG(INFO) << "\n" << result;
     pclose(output);
 }
