@@ -113,9 +113,9 @@ private:
         }
 
         if (select_column == Schema::Column::Userid) {
-            std::vector<std::string> data;
+            std::vector<std::string_view> data;
             for (auto iterator : selector) {
-                data.emplace_back(create_from_string128(iterator->user_id));
+                data.emplace_back(create_from_string128_ref(iterator->user_id));
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
@@ -125,9 +125,9 @@ private:
         }
 
         if (select_column == Schema::Column::Name) {
-            std::vector<std::string> data;
+            std::vector<std::string_view> data;
             for (auto iterator : selector) {
-                data.emplace_back(create_from_string128(iterator->name));
+                data.emplace_back(create_from_string128_ref(iterator->name));
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
