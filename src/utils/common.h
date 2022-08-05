@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glog/logging.h>
 #include <sys/stat.h>
 
 #include <cstddef>
@@ -68,4 +69,17 @@ inline std::string_view create_from_string128_ref(const void* address) {
 
 inline bool equal(const Schema::Row& lhs, const Schema::Row& rhs) {
     return memcmp(&lhs, &rhs, Schema::ROW_LENGTH) == 0;
+}
+
+inline void print_meminfo() {
+    auto cmd = "cat /proc/meminfo";
+    FILE* output = popen(cmd, "r");
+    char buffer[1024];
+    std::string result;
+    while (fgets(buffer, 1024, output)) {
+        fprintf(stdout, "%s", buffer);
+        result += buffer;
+    }
+    LOG(INFO) << result;
+    pclose(output);
 }
