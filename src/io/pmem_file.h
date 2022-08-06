@@ -50,11 +50,11 @@ public:
     ~PmemFile() { pmem_unmap(_header, _mapped_len); }
 
     void append(const void* data_ptr) {
-        pmem_memcpy(_current, data_ptr, Schema::ROW_LENGTH, 0);
+        pmem_memcpy_nodrain(_current, data_ptr, Schema::ROW_LENGTH);
         _current += Schema::ROW_LENGTH;
 
         _size++;
-        pmem_memcpy(_header, &_size, PMEM_HEADER_SIZE, 0);
+        pmem_memcpy_nodrain(_header, &_size, PMEM_HEADER_SIZE);
     }
 
 private:
