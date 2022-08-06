@@ -3,7 +3,6 @@
 #include <glog/logging.h>
 
 #include <algorithm>
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -34,14 +33,9 @@ public:
     void write(const Schema::Row* row) {
         Offset offset;
         {
-            while (_mtx) {
-            }
-            _mtx = true;
-
+            std::unique_lock lock(_mtx);
             offset = _datas.size();
             _datas.emplace_back(*row);
-
-            _mtx = false;
         }
 
         id_index.try_emplace_l(
@@ -174,5 +168,5 @@ private:
     ParallelMap<std::string, Offset> user_id_index;
     ParallelMap<int64_t, Selector> salary_index;
     Container _datas;
-    std::atomic_bool _mtx = false;
+    Mutex _mtx;
 };

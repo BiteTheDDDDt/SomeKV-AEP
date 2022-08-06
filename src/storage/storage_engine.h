@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <thread>
 
 #include "io/readable_file.h"
 #include "storage/disk_storage.h"
@@ -26,12 +27,21 @@ public:
         LOG(INFO) << "Create StorageEngine. _storage_path=" << _storage_path;
     }
 
-    ~StorageEngine() { LOG(INFO) << "Destroy StorageEngine. _storage_path=" << _storage_path; }
+    ~StorageEngine() {
+        LOG(INFO) << "Destroy StorageEngine. _storage_path=" << _storage_path;
+        for (size_t i = 0; i < BUCKET_NUMBER; i++) {
+            delete _wal[i];
+        }
+    }
 
     void write(const void* data) {
         const Schema::Row* row_ptr = static_cast<const Schema::Row*>(data);
-        _memtable.write(row_ptr);
-        _wal[row_ptr->id & BUCKET_NUMBER_MASK]->write(row_ptr);
+
+        auto memtable_write = std::thread(_write_memtable, &_memtable, row_ptr);
+        auto wal_write = std::thread(_write_wal, _wal[row_ptr->id & BUCKET_NUMBER_MASK], row_ptr);
+
+        memtable_write.join();
+        wal_write.join();
     }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
@@ -41,6 +51,11 @@ public:
     }
 
 private:
+    static void _write_memtable(MemoryStorage* memtable, const Schema::Row* row_ptr) {
+        memtable->write(row_ptr);
+    }
+    static void _write_wal(DiskStorage* wal, const Schema::Row* row_ptr) { wal->write(row_ptr); }
+
     std::string _storage_path;
     MemoryStorage _memtable;
     DiskStorage* _wal[BUCKET_NUMBER];
