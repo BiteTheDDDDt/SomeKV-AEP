@@ -15,7 +15,6 @@
 #include "utils/schema.h"
 
 constexpr int WRITE_LOG_TIMES = (1 << 20) - 1;
-constexpr int MAX_DATA_SIZE = 50000000;
 
 class MemoryStorage {
     using Container = std::vector<Schema::Row>;
@@ -28,7 +27,7 @@ class MemoryStorage {
                                           std::allocator<std::pair<const K, V>>, 4UL, std::mutex>;
 
 public:
-    MemoryStorage() { _datas.reserve(MAX_DATA_SIZE); }
+    MemoryStorage() { _datas.reserve(MAX_ROW_SIZE); }
 
     void write(const Schema::Row* row) {
         Offset offset;
@@ -55,6 +54,24 @@ public:
             sync();
             print_meminfo();
         }
+    }
+
+    void write_no_lock(const void* data) {
+        const Schema::Row* row = static_cast<const Schema::Row*>(data);
+
+        Offset offset = _datas.size();
+        _datas.emplace_back(*row);
+        std::string_view user_id = create_from_string128_ref(_datas.back().user_id);
+
+        id_index.try_emplace_l(
+                row->id, [](const auto&) {}, offset);
+
+        user_id_index.try_emplace_l(
+                user_id, [](const auto&) {}, offset);
+
+        salary_index.try_emplace_l(
+                row->salary, [offset](auto& v) { v.second.emplace_back(offset); },
+                Selector {offset});
     }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,

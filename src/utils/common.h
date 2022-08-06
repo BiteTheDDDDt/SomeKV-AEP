@@ -18,6 +18,8 @@ constexpr const size_t WRITE_FILE_BUFFER_SIZE = 1;
 constexpr size_t BUCKET_NUMBER = (1 << 6);
 constexpr size_t BUCKET_NUMBER_MASK = BUCKET_NUMBER - 1;
 
+constexpr size_t MAX_ROW_SIZE=50000000;
+
 inline uint64_t get_file_size(std::string path) {
     struct ::stat file_stat;
     if (stat(path.data(), &file_stat) != 0) {

@@ -8,6 +8,7 @@
 #include "io/readable_file.h"
 #include "storage/disk_storage.h"
 #include "storage/memory_storage.h"
+#include "storage/pmem_storage.h"
 #include "utils/common.h"
 #include "utils/schema.h"
 
@@ -16,12 +17,11 @@ const std::string WAL_PATH_SUFFIX = std::string("wal.dat");
 class StorageEngine {
 public:
     StorageEngine(const std::string& aep_dir, const std::string& disk_dir)
-            : _storage_path(disk_dir + WAL_PATH_SUFFIX) {
+            : _storage_path(aep_dir + WAL_PATH_SUFFIX) {
         sync();
         for (size_t i = 0; i < BUCKET_NUMBER; i++) {
             std::string sub_path = _storage_path + "." + std::to_string(i);
-            ReadableFile(sub_path).recover(_memtable);
-            _wal[i] = new DiskStorage(sub_path);
+            _wal[i] = new PmemStorage(sub_path, _memtable);
         }
         LOG(INFO) << "Create StorageEngine. _storage_path=" << _storage_path;
     }
@@ -48,5 +48,5 @@ public:
 private:
     std::string _storage_path;
     MemoryStorage _memtable;
-    DiskStorage* _wal[BUCKET_NUMBER];
+    PmemStorage* _wal[BUCKET_NUMBER];
 };
