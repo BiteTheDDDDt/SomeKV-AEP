@@ -42,7 +42,7 @@ public:
                 row->id, [](const auto&) {}, offset);
 
         user_id_index.try_emplace_l(
-                create_from_string128(row->user_id), [](const auto&) {}, offset);
+                create_from_string128_ref(row->user_id), [](const auto&) {}, offset);
 
         salary_index.try_emplace_l(
                 row->salary, [offset](auto& v) { v.second.emplace_back(offset); },
@@ -156,7 +156,7 @@ private:
         }
 
         if (where_column == Schema::Column::Userid) {
-            std::string key_value = create_from_string128(column_key);
+            std::string_view key_value = create_from_string128_ref(column_key);
             user_id_index.if_contains(
                     key_value, [&selector](const auto& v) { selector.emplace_back(v.second); });
         }
@@ -165,7 +165,7 @@ private:
     }
 
     ParallelMap<int64_t, Offset> id_index;
-    ParallelMap<std::string, Offset> user_id_index;
+    ParallelMap<std::string_view, Offset> user_id_index;
     ParallelMap<int64_t, Selector> salary_index;
     Container _datas;
     Mutex _mtx;
