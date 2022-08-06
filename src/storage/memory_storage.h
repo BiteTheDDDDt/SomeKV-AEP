@@ -32,17 +32,19 @@ public:
 
     void write(const Schema::Row* row) {
         Offset offset;
+        std::string_view user_id;
         {
             std::unique_lock lock(_mtx);
             offset = _datas.size();
             _datas.emplace_back(*row);
+            user_id = create_from_string128_ref(_datas.back().user_id);
         }
 
         id_index.try_emplace_l(
                 row->id, [](const auto&) {}, offset);
 
         user_id_index.try_emplace_l(
-                create_from_string128_ref(row->user_id), [](const auto&) {}, offset);
+                user_id, [](const auto&) {}, offset);
 
         salary_index.try_emplace_l(
                 row->salary, [offset](auto& v) { v.second.emplace_back(offset); },
