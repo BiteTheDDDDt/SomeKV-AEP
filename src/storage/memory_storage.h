@@ -48,12 +48,6 @@ public:
         salary_index.try_emplace_l(
                 row->salary, [offset](auto& v) { v.second.emplace_back(offset); },
                 Selector {offset});
-
-        if ((offset & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
-            LOG(INFO) << "Write: " << offset;
-            sync();
-            print_meminfo();
-        }
     }
 
     void write_no_lock(const void* data) {
