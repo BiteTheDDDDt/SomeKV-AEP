@@ -14,12 +14,12 @@
 #include "utils/common.h"
 #include "utils/schema.h"
 
-constexpr int WRITE_LOG_TIMES = (1 << 20) - 1;
+constexpr int WRITE_LOG_TIMES = (1 << 24) - 1;
 
 class MemoryStorage {
-    using Container = std::list<Schema::Row>;
-    using Iterator = Container::iterator;
-    using Selector = std::list<Iterator>;
+    using Container = std::vector<Schema::Row>;
+    using Offset = size_t;
+    using Selector = std::vector<Offset>;
     using Mutex = std::mutex;
     template <typename K, typename V>
     using ParallelMap =
@@ -28,21 +28,22 @@ class MemoryStorage {
 
 public:
     void write(const Schema::Row* row) {
-        Iterator it;
+        Offset offset;
         {
             std::unique_lock lock(_mtx);
-            _datas.emplace_front(*row);
-            it = _datas.begin();
+            offset = _datas.size();
+            _datas.emplace_back(*row);
         }
 
         id_index.try_emplace_l(
-                row->id, [](const auto&) {}, it);
+                row->id, [](const auto&) {}, offset);
 
         user_id_index.try_emplace_l(
-                create_from_string128(row->user_id), [](const auto&) {}, it);
+                create_from_string128(row->user_id), [](const auto&) {}, offset);
 
         salary_index.try_emplace_l(
-                row->salary, [it](auto& v) { v.second.emplace_back(it); }, Selector {it});
+                row->salary, [offset](auto& v) { v.second.emplace_back(offset); },
+                Selector {offset});
 
         if (((++_size) & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
             LOG(INFO) << "Write: " << _size;
@@ -65,24 +66,24 @@ public:
     }
 
 private:
-    void read_single(int32_t select_column, char* res, Iterator iterator) {
+    void read_single(int32_t select_column, char* res, Offset offset) {
         if (select_column == Schema::Column::Id) {
-            memcpy(res, &iterator->id, Schema::ID_LENGTH);
+            memcpy(res, &_datas[offset].id, Schema::ID_LENGTH);
             res += Schema::ID_LENGTH;
         }
 
         if (select_column == Schema::Column::Salary) {
-            memcpy(res, &iterator->salary, Schema::SALARY_LENGTH);
+            memcpy(res, &_datas[offset].salary, Schema::SALARY_LENGTH);
             res += Schema::SALARY_LENGTH;
         }
 
         if (select_column == Schema::Column::Userid) {
-            memcpy(res, iterator->user_id, Schema::USERID_LENGTH);
+            memcpy(res, _datas[offset].user_id, Schema::USERID_LENGTH);
             res += Schema::USERID_LENGTH;
         }
 
         if (select_column == Schema::Column::Name) {
-            memcpy(res, iterator->name, Schema::NAME_LENGTH);
+            memcpy(res, _datas[offset].name, Schema::NAME_LENGTH);
             res += Schema::NAME_LENGTH;
         }
     }
@@ -90,8 +91,8 @@ private:
     void read_multiple(int32_t select_column, char* res, const Selector& selector) {
         if (select_column == Schema::Column::Id) {
             std::vector<int64_t> data;
-            for (auto iterator : selector) {
-                data.emplace_back(iterator->id);
+            for (auto offset : selector) {
+                data.emplace_back(_datas[offset].id);
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
@@ -102,8 +103,8 @@ private:
 
         if (select_column == Schema::Column::Salary) {
             std::vector<int64_t> data;
-            for (auto iterator : selector) {
-                data.emplace_back(iterator->salary);
+            for (auto offset : selector) {
+                data.emplace_back(_datas[offset].salary);
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
@@ -114,8 +115,8 @@ private:
 
         if (select_column == Schema::Column::Userid) {
             std::vector<std::string_view> data;
-            for (auto iterator : selector) {
-                data.emplace_back(create_from_string128_ref(iterator->user_id));
+            for (auto offset : selector) {
+                data.emplace_back(create_from_string128_ref(_datas[offset].user_id));
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
@@ -126,8 +127,8 @@ private:
 
         if (select_column == Schema::Column::Name) {
             std::vector<std::string_view> data;
-            for (auto iterator : selector) {
-                data.emplace_back(create_from_string128_ref(iterator->name));
+            for (auto offset : selector) {
+                data.emplace_back(create_from_string128_ref(_datas[offset].name));
             }
             std::sort(data.begin(), data.end());
             for (auto i : data) {
@@ -160,8 +161,8 @@ private:
         return selector;
     }
 
-    ParallelMap<int64_t, Iterator> id_index;
-    ParallelMap<std::string, Iterator> user_id_index;
+    ParallelMap<int64_t, Offset> id_index;
+    ParallelMap<std::string, Offset> user_id_index;
     ParallelMap<int64_t, Selector> salary_index;
     Container _datas;
     Mutex _mtx;
