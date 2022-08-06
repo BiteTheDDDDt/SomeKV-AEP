@@ -15,6 +15,7 @@
 #include "utils/schema.h"
 
 constexpr int WRITE_LOG_TIMES = (1 << 20) - 1;
+constexpr int MAX_DATA_SIZE = 50000000;
 
 class MemoryStorage {
     using Container = std::vector<Schema::Row>;
@@ -27,6 +28,8 @@ class MemoryStorage {
                                           std::allocator<std::pair<const K, V>>, 4UL, std::mutex>;
 
 public:
+    MemoryStorage() { _datas.reserve(MAX_DATA_SIZE); }
+
     void write(const Schema::Row* row) {
         Offset offset;
         {
@@ -45,8 +48,8 @@ public:
                 row->salary, [offset](auto& v) { v.second.emplace_back(offset); },
                 Selector {offset});
 
-        if (((++_size) & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
-            LOG(INFO) << "Write: " << _size;
+        if ((offset & WRITE_LOG_TIMES) == WRITE_LOG_TIMES) {
+            LOG(INFO) << "Write: " << offset;
             sync();
             print_meminfo();
         }
@@ -166,5 +169,4 @@ private:
     ParallelMap<int64_t, Selector> salary_index;
     Container _datas;
     Mutex _mtx;
-    std::atomic<uint64_t> _size = 0;
 };
