@@ -30,6 +30,7 @@ public:
     MemoryStorage() { _datas.reserve(MAX_ROW_SIZE); }
 
     void write(const Schema::Row* row) {
+        if (_datas.size() > WRITE_LOG_TIMES) return;
         Offset offset;
         std::string_view user_id;
         {
