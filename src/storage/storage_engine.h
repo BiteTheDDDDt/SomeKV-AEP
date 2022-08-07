@@ -27,8 +27,9 @@ public:
             semaphores.push_back(new std::__atomic_semaphore_base(0));
 
             thread_pool.push_back(std::thread([&](int id){
+                auto _wal_thread = new PmemStorage(sub_path, _memtable);
                 while(1){
-                    auto _wal_thread = new PmemStorage(sub_path, _memtable);
+
                     semaphores[id]->acquire();
                     _wal_thread->write(&row_data[id].front());
                     row_data[id].pop();
