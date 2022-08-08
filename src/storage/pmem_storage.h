@@ -10,6 +10,7 @@ public:
     PmemStorage(const std::string& path, MemoryStorage& memtable) : _wal(path, memtable) {}
 
     void write(const void* row_ptr) {
+        std::unique_lock lock(_mtx);
         _wal.append(row_ptr);
     }
 
