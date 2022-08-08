@@ -33,7 +33,7 @@ public:
         if ((_header = reinterpret_cast<char*>(
                      pmem_map_file(path.data(), 0, 0, 0666, &_mapped_len, &_is_pmem))) == nullptr) {
             perror("pmem_map_file");
-            exit(1);
+            LOG(FATAL) << "pmem_map_file fail.";
         }
 
         _current = _header + PMEM_HEADER_SIZE;
@@ -44,6 +44,10 @@ public:
                 memtable.write_no_lock(_current);
                 _current += Schema::ROW_LENGTH;
             }
+        } else {
+            LOG(INFO) << "Init: pre page fault.";
+            pmem_memset_persist(_header, 0, PMEM_FILE_SIZE);
+            LOG(INFO) << "Init: pre page fault done.";
         }
     }
 
