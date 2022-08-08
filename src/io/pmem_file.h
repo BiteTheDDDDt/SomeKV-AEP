@@ -37,7 +37,7 @@ public:
 
         _current = _header + PMEM_HEADER_SIZE;
         if (need_recover) {
-            memset(buffer, 0, sizeof(buffer));
+            memset(buffer, -1, sizeof(buffer));
             while (_size < PMEM_MAX_ROW_SIZE) {
                 if (memcmp(_current, buffer, Schema::ROW_LENGTH) == 0) {
                     break;
@@ -49,7 +49,7 @@ public:
             LOG(INFO) << "Recover: size=" << _size;
         } else {
             LOG(INFO) << "Init: pre page fault.";
-            pmem_memset_persist(_header, 0, PMEM_FILE_SIZE);
+            pmem_memset_persist(_header, -1, PMEM_FILE_SIZE);
             LOG(INFO) << "Init: pre page fault done.";
         }
     }
