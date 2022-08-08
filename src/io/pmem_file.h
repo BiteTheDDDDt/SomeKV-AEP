@@ -12,6 +12,7 @@
 constexpr size_t PMEM_HEADER_SIZE = sizeof(size_t);
 constexpr size_t PMEM_MAX_ROW_SIZE = (MAX_ROW_SIZE / BUCKET_NUMBER + 1);
 constexpr size_t PMEM_FILE_SIZE = Schema::ROW_LENGTH * PMEM_MAX_ROW_SIZE + PMEM_HEADER_SIZE;
+constexpr char PMEM_MAGIC_FLAG = 88;
 
 class PmemFile {
 public:
@@ -37,7 +38,7 @@ public:
 
         _current = _header + PMEM_HEADER_SIZE;
         if (need_recover) {
-            memset(buffer, -1, sizeof(buffer));
+            memset(buffer, PMEM_MAGIC_FLAG, sizeof(buffer));
             while (_size < PMEM_MAX_ROW_SIZE) {
                 if (memcmp(_current, buffer, Schema::ROW_LENGTH) == 0) {
                     break;
@@ -49,7 +50,7 @@ public:
             LOG(INFO) << "Recover: size=" << _size;
         } else {
             LOG(INFO) << "Init: pre page fault.";
-            pmem_memset_persist(_header, -1, PMEM_FILE_SIZE);
+            pmem_memset_persist(_header, PMEM_MAGIC_FLAG, PMEM_FILE_SIZE);
             LOG(INFO) << "Init: pre page fault done.";
         }
     }
