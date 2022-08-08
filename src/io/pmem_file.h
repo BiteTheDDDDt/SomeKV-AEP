@@ -10,9 +10,8 @@
 #include "utils/schema.h"
 
 constexpr size_t PMEM_HEADER_SIZE = sizeof(size_t);
-
-constexpr size_t PMEM_FILE_SIZE =
-        Schema::ROW_LENGTH * (MAX_ROW_SIZE / BUCKET_NUMBER + 1) + PMEM_HEADER_SIZE;
+constexpr size_t PMEM_MAX_ROW_SIZE = (MAX_ROW_SIZE / BUCKET_NUMBER + 1);
+constexpr size_t PMEM_FILE_SIZE = Schema::ROW_LENGTH * PMEM_MAX_ROW_SIZE + PMEM_HEADER_SIZE;
 
 class PmemFile {
 public:
@@ -37,13 +36,17 @@ public:
         }
 
         _current = _header + PMEM_HEADER_SIZE;
-
         if (need_recover) {
-            _size = *reinterpret_cast<size_t*>(_header);
-            for (size_t i = 0; i < _size; i++) {
+            memset(buffer, 0, sizeof(buffer));
+            while (_size < PMEM_MAX_ROW_SIZE) {
+                if (memcmp(_current, buffer, Schema::ROW_LENGTH) == 0) {
+                    break;
+                }
+                _size++;
                 memtable.write_no_lock(_current);
                 _current += Schema::ROW_LENGTH;
             }
+            LOG(INFO) << "Recover: size=" << _size;
         } else {
             LOG(INFO) << "Init: pre page fault.";
             pmem_memset_persist(_header, 0, PMEM_FILE_SIZE);
@@ -56,9 +59,6 @@ public:
     void append(const void* data_ptr) {
         pmem_memcpy(_current, data_ptr, Schema::ROW_LENGTH, PMEM_F_MEM_NONTEMPORAL);
         _current += Schema::ROW_LENGTH;
-
-        _size++;
-        pmem_memcpy(_header, &_size, PMEM_HEADER_SIZE, PMEM_F_MEM_NONTEMPORAL);
     }
 
 private:
@@ -69,4 +69,6 @@ private:
     char* _header;
 
     size_t _size = 0;
+
+    char buffer[Schema::ROW_LENGTH];
 };
