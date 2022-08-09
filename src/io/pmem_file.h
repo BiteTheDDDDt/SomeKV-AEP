@@ -12,7 +12,7 @@
 constexpr size_t PMEM_HEADER_SIZE = sizeof(size_t);
 constexpr size_t PMEM_MAX_ROW_SIZE = (MAX_ROW_SIZE / BUCKET_NUMBER + 1);
 constexpr size_t PMEM_FILE_SIZE = Schema::ROW_LENGTH * PMEM_MAX_ROW_SIZE + PMEM_HEADER_SIZE;
-constexpr char PMEM_MAGIC_FLAG = 88;
+constexpr char PMEM_MAGIC_FLAG = -88;
 
 class PmemFile {
 public:
