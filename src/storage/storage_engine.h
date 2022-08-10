@@ -2,6 +2,7 @@
 
 #include <glog/logging.h>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdlib>
 
@@ -13,6 +14,9 @@
 #include "utils/schema.h"
 
 const std::string WAL_PATH_SUFFIX = std::string("wal.dat");
+
+inline thread_local int wal_id = -1;
+inline std::atomic_int wal_number = 0;
 
 class StorageEngine {
 public:
@@ -35,7 +39,10 @@ public:
     void write(const void* data) {
         const Schema::Row* row_ptr = static_cast<const Schema::Row*>(data);
         _memtable.write(row_ptr);
-        _wal[row_ptr->id & BUCKET_NUMBER_MASK]->write(row_ptr);
+        if (wal_id == -1) {
+            wal_id = wal_number++;
+        }
+        _wal[wal_id]->write(row_ptr);
     }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,

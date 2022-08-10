@@ -44,6 +44,7 @@ public:
                 memtable.write_no_lock(_current);
                 _current += Schema::ROW_LENGTH;
             }
+            LOG(INFO) << "Recover: size=" << _size;
         } else {
             LOG(INFO) << "Init: pre page fault.";
             pmem_memset_persist(_header, 0, PMEM_FILE_SIZE);

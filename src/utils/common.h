@@ -15,8 +15,7 @@ constexpr const size_t READ_FILE_BUFFER_SIZE = 1;
 
 constexpr const size_t WRITE_FILE_BUFFER_SIZE = 1;
 
-constexpr size_t BUCKET_NUMBER = (1 << 6);
-constexpr size_t BUCKET_NUMBER_MASK = BUCKET_NUMBER - 1;
+constexpr size_t BUCKET_NUMBER = 50;
 
 constexpr size_t MAX_ROW_SIZE = 50000000;
 
