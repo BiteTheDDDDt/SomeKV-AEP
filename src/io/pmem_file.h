@@ -9,7 +9,7 @@
 #include "utils/common.h"
 #include "utils/schema.h"
 
-constexpr size_t PMEM_HEADER_SIZE = sizeof(size_t);
+constexpr size_t PMEM_HEADER_SIZE = sizeof(int);
 
 constexpr size_t PMEM_FILE_SIZE =
         Schema::ROW_LENGTH * (MAX_ROW_SIZE / BUCKET_NUMBER + 1) + PMEM_HEADER_SIZE;
@@ -39,8 +39,8 @@ public:
         _current = _header + PMEM_HEADER_SIZE;
 
         if (need_recover) {
-            _size = *reinterpret_cast<size_t*>(_header);
-            for (size_t i = 0; i < _size; i++) {
+            _size = *reinterpret_cast<int*>(_header);
+            for (int i = 0; i < _size; i++) {
                 memtable.write_no_lock(_current);
                 _current += Schema::ROW_LENGTH;
             }
@@ -69,5 +69,5 @@ private:
     char* _current;
     char* _header;
 
-    size_t _size = 0;
+    int _size = 0;
 };
