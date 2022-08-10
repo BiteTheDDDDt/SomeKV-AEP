@@ -14,7 +14,7 @@
 #include "utils/common.h"
 #include "utils/schema.h"
 
-constexpr int WRITE_LOG_TIMES = (1 << 16) - 1;
+constexpr int WRITE_LOG_TIMES = (1 << 13) - 1;
 
 class MemoryStorage {
     using Container = std::vector<Schema::Row>;
