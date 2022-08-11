@@ -111,7 +111,7 @@ private:
             for (auto offset : selector) {
                 data.emplace_back(_datas[offset].id);
             }
-            std::sort(data.begin(), data.end());
+            //std::sort(data.begin(), data.end());
             for (auto i : data) {
                 memcpy(res, &i, Schema::ID_LENGTH);
                 res += Schema::ID_LENGTH;
@@ -123,7 +123,7 @@ private:
             for (auto offset : selector) {
                 data.emplace_back(_datas[offset].salary);
             }
-            std::sort(data.begin(), data.end());
+            //std::sort(data.begin(), data.end());
             for (auto i : data) {
                 memcpy(res, &i, Schema::SALARY_LENGTH);
                 res += Schema::SALARY_LENGTH;
@@ -135,7 +135,7 @@ private:
             for (auto offset : selector) {
                 data.emplace_back(create_from_string128_ref(_datas[offset].user_id));
             }
-            std::sort(data.begin(), data.end());
+            //std::sort(data.begin(), data.end());
             for (auto i : data) {
                 memcpy(res, i.data(), Schema::USERID_LENGTH);
                 res += Schema::USERID_LENGTH;
@@ -147,7 +147,7 @@ private:
             for (auto offset : selector) {
                 data.emplace_back(create_from_string128_ref(_datas[offset].name));
             }
-            std::sort(data.begin(), data.end());
+            //std::sort(data.begin(), data.end());
             for (auto i : data) {
                 memcpy(res, i.data(), Schema::NAME_LENGTH);
                 res += Schema::NAME_LENGTH;
