@@ -24,7 +24,7 @@ class MemoryStorage {
     template <typename K, typename V>
     using ParallelMap =
             phmap::parallel_flat_hash_map<K, V, phmap::Hash<K>, phmap::EqualTo<K>,
-                                          std::allocator<std::pair<const K, V>>, 4UL, std::mutex>;
+                                          std::allocator<std::pair<const K, V>>, 12UL, std::mutex>;
 
 public:
     MemoryStorage() { _datas.reserve(MAX_ROW_SIZE); }
