@@ -10,6 +10,7 @@
 #include <list>
 #include <string_view>
 
+#include "absl/hash/hash.h"
 #include "parallel_hashmap/phmap.h"
 #include "utils/common.h"
 #include "utils/schema.h"

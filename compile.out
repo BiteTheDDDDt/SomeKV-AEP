@@ -1,0 +1,243 @@
+CMake Warning at thirdparty/abseil-cpp-20220623.0/CMakeLists.txt:70 (message):
+  A future Abseil release will default ABSL_PROPAGATE_CXX_STD to ON for CMake
+  3.8 and up.  We recommend enabling this option to ensure your project still
+  builds correctly.
+
+
+CMake Warning (dev) at thirdparty/glog-0.6.0/CMakeLists.txt:599 (add_library):
+  Policy CMP0063 is not set: Honor visibility properties for all target
+  types.  Run "cmake --help-policy CMP0063" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  Target "glog" of type "STATIC_LIBRARY" has the following visibility
+  properties set for CXX:
+
+    CXX_VISIBILITY_PRESET
+    VISIBILITY_INLINES_HIDDEN
+
+  For compatibility CMake is not honoring them for this target.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+In file included from /home/bitetheddddt/contest/db-challenge/cpp_demo/thirdparty/abseil-cpp-20220623.0/absl/container/inlined_vector.h:53,
+                 from /home/bitetheddddt/contest/db-challenge/cpp_demo/thirdparty/abseil-cpp-20220623.0/absl/strings/cord.h:79,
+                 from /home/bitetheddddt/contest/db-challenge/cpp_demo/thirdparty/abseil-cpp-20220623.0/absl/strings/cord.cc:15:
+In member function ‘absl::lts_20220623::inlined_vector_internal::SizeType<A> absl::lts_20220623::inlined_vector_internal::Storage<T, N, A>::GetAllocatedCapacity() const [with T = absl::lts_20220623::cord_internal::CordRep*; long unsigned int N = 2; A = std::allocator<absl::lts_20220623::cord_internal::CordRep*>]’,
+    inlined from ‘void absl::lts_20220623::inlined_vector_internal::Storage<T, N, A>::DeallocateIfAllocated() [with T = absl::lts_20220623::cord_internal::CordRep*; long unsigned int N = 2; A = std::allocator<absl::lts_20220623::cord_internal::CordRep*>]’ at /home/bitetheddddt/contest/db-challenge/cpp_demo/thirdparty/abseil-cpp-20220623.0/absl/container/internal/inlined_vector.h:452:35,
+    inlined from ‘absl::lts_20220623::inlined_vector_internal::Storage<T, N, A>::~Storage() [with T = absl::lts_20220623::cord_internal::CordRep*; long unsigned int N = 2; A = std::allocator<absl::lts_20220623::cord_internal::CordRep*>]’ at /home/bitetheddddt/contest/db-challenge/cpp_demo/thirdparty/abseil-cpp-20220623.0/absl/container/internal/inlined_vector.h:323:28,
+    inlined from ‘absl::lts_20220623::InlinedVector<T, N, A>::~InlinedVector() [with T = absl::lts_20220623::cord_internal::CordRep*; long unsigned int N = 2; A = std::allocator<absl::lts_20220623::cord_internal::CordRep*>]’ at /home/bitetheddddt/contest/db-challenge/cpp_demo/thirdparty/abseil-cpp-20220623.0/absl/container/inlined_vector.h:256:21,
+    inlined from ‘bool absl::lts_20220623::VerifyNode(absl::lts_20220623::cord_internal::CordRep*, absl::lts_20220623::cord_internal::CordRep*, bool)’ at /home/bitetheddddt/contest/db-challenge/cpp_demo/thirdparty/abseil-cpp-20220623.0/absl/strings/cord.cc:1301:1:
+/home/bitetheddddt/contest/db-challenge/cpp_demo/thirdparty/abseil-cpp-20220623.0/absl/container/internal/inlined_vector.h:360:28: warning: ‘worklist.absl::lts_20220623::InlinedVector<absl::lts_20220623::cord_internal::CordRep*, 2, std::allocator<absl::lts_20220623::cord_internal::CordRep*> >::storage_.absl::lts_20220623::inlined_vector_internal::Storage<absl::lts_20220623::cord_internal::CordRep*, 2, std::allocator<absl::lts_20220623::cord_internal::CordRep*> >::data_.absl::lts_20220623::inlined_vector_internal::Storage<absl::lts_20220623::cord_internal::CordRep*, 2, std::allocator<absl::lts_20220623::cord_internal::CordRep*> >::Data::allocated.absl::lts_20220623::inlined_vector_internal::Storage<absl::lts_20220623::cord_internal::CordRep*, 2, std::allocator<absl::lts_20220623::cord_internal::CordRep*> >::Allocated::allocated_capacity’ may be used uninitialized [-Wmaybe-uninitialized]
+  360 |     return data_.allocated.allocated_capacity;
+      |                            ^~~~~~~~~~~~~~~~~~
+/home/bitetheddddt/contest/db-challenge/cpp_demo/thirdparty/abseil-cpp-20220623.0/absl/strings/cord.cc: In function ‘bool absl::lts_20220623::VerifyNode(absl::lts_20220623::cord_internal::CordRep*, absl::lts_20220623::cord_internal::CordRep*, bool)’:
+/home/bitetheddddt/contest/db-challenge/cpp_demo/thirdparty/abseil-cpp-20220623.0/absl/strings/cord.cc:1267:36: note: ‘worklist’ declared here
+ 1267 |   absl::InlinedVector<CordRep*, 2> worklist;
+      |                                    ^~~~~~~~
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I20220811 15:42:36.064265 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:36.367875 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:36.371292 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:37.167661 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:37.168133 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:38.327728 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:38.329272 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:39.184617 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:39.185276 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:39.942391 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:39.942886 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:40.698278 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:40.699416 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:40.923450 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:40.924091 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:41.128899 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:41.129379 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:41.378564 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:41.411203 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:41.599102 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:41.608546 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:41.810359 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:41.811089 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:42.193527 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:42.194309 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:42.588136 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:42.589238 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:42.853853 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:42.854547 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:43.147205 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:44.736802 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:44.994704 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:45.160583 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:45.460057 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:45.460651 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:45.652465 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:45.653618 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:45.882364 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:45.883040 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:46.098196 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:46.099668 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:46.358701 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:46.359571 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:46.599753 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:46.600369 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:48.588936 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:48.736523 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:48.966051 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:48.966701 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:49.202471 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:49.204139 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:49.715351 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:49.716614 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:51.269286 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:51.273012 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:52.158954 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:52.159456 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:52.632779 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:52.633293 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:53.139942 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:53.140671 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:53.815933 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:53.819119 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:54.251595 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:54.256593 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:54.662320 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:54.672320 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:54.920089 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:54.928316 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:55.148320 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:55.153620 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:55.419961 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:55.421065 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:55.777595 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:55.778515 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:55.962574 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:55.966414 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:56.169255 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:56.170285 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:56.443135 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:56.449295 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:56.759176 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:56.766045 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:57.106817 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:57.107805 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:57.347503 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:57.348193 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:57.569847 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:57.571797 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:57.831408 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:57.833361 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:58.086020 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:58.090498 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:58.318428 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:58.319008 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:58.618510 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:58.625161 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:59.042346 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:59.042862 19313 pmem_file.h:49] Init: pre page fault.
+I20220811 15:42:59.288901 19313 pmem_file.h:51] Init: pre page fault done.
+I20220811 15:42:59.289002 19313 storage_engine.h:29] Create StorageEngine. _storage_path=storage/aep/wal.dat
+I20220811 15:42:59.292300 19313 storage_engine.h:33] Destroy StorageEngine. _storage_path=storage/aep/wal.dat
+I20220811 15:42:59.392422 19313 pmem_file.h:47] Recover: size=10
+I20220811 15:42:59.396061 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.397050 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.398145 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.398622 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.399024 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.399392 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.399835 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.400218 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.400600 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.401065 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.401875 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.402446 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.403421 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.404163 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.405088 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.405481 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.405836 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.406237 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.406950 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.407373 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.407743 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.407932 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.408043 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.408129 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.408214 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.408308 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.408411 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.408496 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.408582 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.408686 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.408789 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.408874 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.408962 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.409049 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.409149 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.409235 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.409595 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.409687 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.409790 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.409885 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.409971 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.410060 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.410163 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.410264 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.410351 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.410437 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.410547 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.410634 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.410718 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.410764 19313 storage_engine.h:29] Create StorageEngine. _storage_path=storage/aep/wal.dat
+I20220811 15:42:59.410812 19313 storage_engine.h:33] Destroy StorageEngine. _storage_path=storage/aep/wal.dat
+I20220811 15:42:59.412703 19313 pmem_file.h:47] Recover: size=20
+I20220811 15:42:59.412840 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.412940 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413046 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413115 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413182 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413259 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413341 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413431 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413496 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413566 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413651 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413748 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413800 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413851 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.413940 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414037 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414105 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414175 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414268 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414355 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414424 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414494 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414580 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414665 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414734 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414803 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414889 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.414976 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.415068 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.415151 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.415256 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.415338 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.415421 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.415504 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.415632 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.415743 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.415848 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.415951 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.416072 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.416177 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.416549 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.416661 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.416781 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.416867 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.416973 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.417073 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.417191 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.417317 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.417598 19313 pmem_file.h:47] Recover: size=0
+I20220811 15:42:59.417744 19313 storage_engine.h:29] Create StorageEngine. _storage_path=storage/aep/wal.dat
+I20220811 15:42:59.417920 19313 storage_engine.h:33] Destroy StorageEngine. _storage_path=storage/aep/wal.dat
+I20220811 15:42:59.420053 19313 test_main.cpp:135] pass all check
