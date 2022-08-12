@@ -47,7 +47,7 @@ public:
             LOG(INFO) << "Recover: size=" << _size;
         } else {
             LOG(INFO) << "Init: pre page fault.";
-            pmem_memset_persist(_header, 0, PMEM_FILE_SIZE);
+            pmem_memset(_header, 0, PMEM_FILE_SIZE, PMEM_F_MEM_NONTEMPORAL);
             LOG(INFO) << "Init: pre page fault done.";
         }
     }
