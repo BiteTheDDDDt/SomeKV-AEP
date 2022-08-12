@@ -55,11 +55,11 @@ public:
     ~PmemFile() { pmem_unmap(_header, _mapped_len); }
 
     void append(const void* data_ptr) {
-        pmem_memcpy(_current, data_ptr, Schema::ROW_LENGTH, PMEM_F_MEM_NONTEMPORAL);
+        pmem_memcpy(_current, data_ptr, Schema::ROW_LENGTH, PMEM_F_MEM_NONTEMPORAL | PMEM_F_MEM_WC);
         _current += Schema::ROW_LENGTH;
 
         _size++;
-        pmem_memcpy(_header, &_size, PMEM_HEADER_SIZE, PMEM_F_MEM_NONTEMPORAL);
+        pmem_memcpy(_header, &_size, PMEM_HEADER_SIZE, PMEM_F_MEM_NONTEMPORAL | PMEM_F_MEM_WC);
     }
 
 private:
