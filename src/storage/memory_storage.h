@@ -73,84 +73,35 @@ public:
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, char* res) {
         auto selector = get_selector(where_column, column_key, column_key_len);
-        size_t size = selector.size();
-
-        if (size > 1) {
-            read_multiple(select_column, res, selector);
-        } else if (size == 1) {
-            read_single(select_column, res, *selector.begin());
-        }
-        return size;
+        read_selector(select_column, res, selector);
+        return selector.size();
     }
 
 private:
-    void read_single(int32_t select_column, char* res, Offset offset) {
+    void read_selector(int32_t select_column, char* res, const Selector& selector) {
         if (select_column == Schema::Column::Id) {
-            memcpy(res, &_datas[offset].id, Schema::ID_LENGTH);
-            res += Schema::ID_LENGTH;
-        }
-
-        if (select_column == Schema::Column::Salary) {
-            memcpy(res, &_datas[offset].salary, Schema::SALARY_LENGTH);
-            res += Schema::SALARY_LENGTH;
-        }
-
-        if (select_column == Schema::Column::Userid) {
-            memcpy(res, _datas[offset].user_id, Schema::USERID_LENGTH);
-            res += Schema::USERID_LENGTH;
-        }
-
-        if (select_column == Schema::Column::Name) {
-            memcpy(res, _datas[offset].name, Schema::NAME_LENGTH);
-            res += Schema::NAME_LENGTH;
-        }
-    }
-
-    void read_multiple(int32_t select_column, char* res, const Selector& selector) {
-        if (select_column == Schema::Column::Id) {
-            std::vector<int64_t> data;
             for (auto offset : selector) {
-                data.emplace_back(_datas[offset].id);
-            }
-            //std::sort(data.begin(), data.end());
-            for (auto i : data) {
-                memcpy(res, &i, Schema::ID_LENGTH);
+                memcpy(res, &_datas[offset].id, Schema::ID_LENGTH);
                 res += Schema::ID_LENGTH;
             }
         }
 
         if (select_column == Schema::Column::Salary) {
-            std::vector<int64_t> data;
             for (auto offset : selector) {
-                data.emplace_back(_datas[offset].salary);
-            }
-            //std::sort(data.begin(), data.end());
-            for (auto i : data) {
-                memcpy(res, &i, Schema::SALARY_LENGTH);
+                memcpy(res, &_datas[offset].salary, Schema::SALARY_LENGTH);
                 res += Schema::SALARY_LENGTH;
             }
         }
-
         if (select_column == Schema::Column::Userid) {
-            std::vector<std::string_view> data;
             for (auto offset : selector) {
-                data.emplace_back(create_from_string128_ref(_datas[offset].user_id));
-            }
-            //std::sort(data.begin(), data.end());
-            for (auto i : data) {
-                memcpy(res, i.data(), Schema::USERID_LENGTH);
+                memcpy(res, _datas[offset].user_id, Schema::USERID_LENGTH);
                 res += Schema::USERID_LENGTH;
             }
         }
 
         if (select_column == Schema::Column::Name) {
-            std::vector<std::string_view> data;
             for (auto offset : selector) {
-                data.emplace_back(create_from_string128_ref(_datas[offset].name));
-            }
-            //std::sort(data.begin(), data.end());
-            for (auto i : data) {
-                memcpy(res, i.data(), Schema::NAME_LENGTH);
+                memcpy(res, _datas[offset].name, Schema::NAME_LENGTH);
                 res += Schema::NAME_LENGTH;
             }
         }
