@@ -12,7 +12,7 @@
 constexpr size_t PMEM_HEADER_SIZE = 1;
 
 constexpr size_t PMEM_FILE_SIZE =
-        Schema::ROW_LENGTH * (MAX_ROW_SIZE / BUCKET_NUMBER + 1) + PMEM_HEADER_SIZE;
+        (Schema::ROW_LENGTH + PMEM_HEADER_SIZE) * (MAX_ROW_SIZE / BUCKET_NUMBER + 1);
 
 class PmemFile {
 public:
