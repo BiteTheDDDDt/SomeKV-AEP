@@ -9,10 +9,11 @@
 #include "utils/common.h"
 #include "utils/schema.h"
 
-constexpr size_t PMEM_HEADER_SIZE = sizeof(int);
+constexpr size_t PMEM_HEADER_SIZE = 1;
 
-constexpr size_t PMEM_FILE_SIZE =
-        Schema::ROW_LENGTH * (MAX_ROW_SIZE / BUCKET_NUMBER + 1) + PMEM_HEADER_SIZE;
+constexpr size_t PMEM_FULL_ROW_SIZE = PMEM_HEADER_SIZE + Schema::ROW_LENGTH;
+
+constexpr size_t PMEM_FILE_SIZE = PMEM_FULL_ROW_SIZE * (MAX_ROW_SIZE / BUCKET_NUMBER + 1);
 
 class PmemFile {
 public:
@@ -36,13 +37,14 @@ public:
             LOG(FATAL) << "pmem_map_file fail.";
         }
 
-        _current = _header + PMEM_HEADER_SIZE;
+        _current = _header;
 
         if (need_recover) {
-            _size = *reinterpret_cast<int*>(_header);
-            for (int i = 0; i < _size; i++) {
+            while (*_current) {
+                _current += PMEM_HEADER_SIZE;
                 memtable.write_no_lock(_current);
                 _current += Schema::ROW_LENGTH;
+                _size++;
             }
             LOG(INFO) << "Recover: size=" << _size;
         } else {
@@ -50,16 +52,19 @@ public:
             pmem_memset_persist(_header, 0, PMEM_FILE_SIZE);
             LOG(INFO) << "Init: pre page fault done.";
         }
+
+        _buffer[0] = 1;
     }
 
     ~PmemFile() { pmem_unmap(_header, _mapped_len); }
 
     void append(const void* data_ptr) {
-        pmem_memcpy(_current, data_ptr, Schema::ROW_LENGTH, PMEM_F_MEM_NONTEMPORAL);
-        _current += Schema::ROW_LENGTH;
+        memcpy(_buffer + PMEM_HEADER_SIZE, data_ptr, Schema::ROW_LENGTH);
+        pmem_memcpy(_current, _buffer, PMEM_FULL_ROW_SIZE,
+                    PMEM_F_MEM_NONTEMPORAL | PMEM_F_MEM_NODRAIN);
+        _current += PMEM_FULL_ROW_SIZE;
 
         _size++;
-        pmem_memcpy(_header, &_size, PMEM_HEADER_SIZE, PMEM_F_MEM_NONTEMPORAL);
     }
 
 private:
@@ -70,4 +75,5 @@ private:
     char* _header;
 
     int _size = 0;
+    char _buffer[PMEM_FULL_ROW_SIZE];
 };
