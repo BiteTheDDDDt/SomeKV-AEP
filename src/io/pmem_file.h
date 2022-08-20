@@ -58,7 +58,7 @@ public:
     void append(const void* data_ptr) {
         memcpy(_buffer + PMEM_HEADER_SIZE, data_ptr, Schema::ROW_LENGTH);
         pmem_memcpy(_current, _buffer, Schema::ROW_LENGTH + PMEM_HEADER_SIZE,
-                    PMEM_F_MEM_NONTEMPORAL);
+                    PMEM_F_MEM_NONTEMPORAL | PMEM_F_MEM_NODRAIN);
         _current += Schema::ROW_LENGTH + PMEM_HEADER_SIZE;
     }
 
