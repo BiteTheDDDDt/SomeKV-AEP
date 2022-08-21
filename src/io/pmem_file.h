@@ -11,7 +11,7 @@
 
 constexpr size_t PMEM_HEADER_SIZE = 1;
 
-constexpr size_t PMEM_FULL_ROW_SIZE = PMEM_HEADER_SIZE + Schema::ROW_LENGTH;
+constexpr size_t PMEM_FULL_ROW_SIZE = 512;
 
 constexpr size_t PMEM_FILE_SIZE = PMEM_FULL_ROW_SIZE * (MAX_ROW_SIZE / BUCKET_NUMBER + 1);
 
@@ -41,9 +41,8 @@ public:
 
         if (need_recover) {
             while (*_current) {
-                _current += PMEM_HEADER_SIZE;
-                memtable.write_no_lock(_current);
-                _current += Schema::ROW_LENGTH;
+                memtable.write_no_lock(_current + PMEM_HEADER_SIZE);
+                _current += PMEM_FULL_ROW_SIZE;
                 _size++;
             }
             LOG(INFO) << "Recover: size=" << _size;
@@ -74,5 +73,5 @@ private:
     char* _header;
 
     int _size = 0;
-    char _buffer[PMEM_FULL_ROW_SIZE + 5];
+    char _buffer[PMEM_FULL_ROW_SIZE];
 };
