@@ -74,5 +74,5 @@ private:
     char* _header;
 
     int _size = 0;
-    char _buffer[PMEM_FULL_ROW_SIZE];
+    char _buffer[PMEM_FULL_ROW_SIZE + 5];
 };
