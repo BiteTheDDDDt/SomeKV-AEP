@@ -9,7 +9,7 @@
 #include "utils/common.h"
 #include "utils/schema.h"
 
-constexpr size_t PMEM_HEADER_SIZE = 1;
+constexpr size_t PMEM_HEADER_SIZE = 4;
 
 constexpr size_t PMEM_FULL_ROW_SIZE = 320;
 
@@ -52,7 +52,7 @@ public:
             LOG(INFO) << "Init: pre page fault done.";
         }
 
-        _buffer[0] = 1;
+        memset(_buffer, -1, sizeof(_buffer));
     }
 
     ~PmemFile() { pmem_unmap(_header, _mapped_len); }
@@ -73,5 +73,5 @@ private:
     char* _header;
 
     int _size = 0;
-    char _buffer[PMEM_FULL_ROW_SIZE * 2];
+    char _buffer[PMEM_FULL_ROW_SIZE];
 };
