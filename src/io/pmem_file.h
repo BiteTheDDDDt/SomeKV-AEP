@@ -11,7 +11,7 @@
 
 constexpr size_t PMEM_HEADER_SIZE = 1;
 
-constexpr size_t PMEM_FULL_ROW_SIZE = 512;
+constexpr size_t PMEM_FULL_ROW_SIZE = 384;
 
 constexpr size_t PMEM_FILE_SIZE = PMEM_FULL_ROW_SIZE * (MAX_ROW_SIZE / BUCKET_NUMBER + 1);
 
