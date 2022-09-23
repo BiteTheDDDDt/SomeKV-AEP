@@ -20,7 +20,7 @@ using asio::ip::tcp;
 
 const int max_length = 8192;
 
-void session(tcp::socket sock,std::function<std::vector<std::string>(char * )>call_back)
+void session(tcp::socket sock,std::function<std::string (char * ,int )>call_back)
 {
     try
     {
@@ -51,16 +51,13 @@ void session(tcp::socket sock,std::function<std::vector<std::string>(char * )>ca
                 throw asio::system_error(error); // Some other error.
         }
         read_data.erase(0,10);
-        std::vector<std::string> call_back_res = call_back(read_data);
+        std::string ret_data = call_back(read_data.data(),(int)read_data.length());
 
         //puts(read_data.data());
 
 //        asio::write(sock, asio::buffer(read_data.substr(0,8).data(), 8));
-        std::string ret_data;
 
-        for(const auto &i : call_back_res){
-            ret_data += i;
-        }
+
 
         int len_ret = ret_data.length();
         std::string ret_string_length = std::to_string(len_ret);
@@ -104,7 +101,7 @@ struct NetworkIO{
 
 private:
 public:
-    NetworkIO(int port, std::function<std::vector<std::string>(char *)> call_back){
+    NetworkIO(int port, std::function<std::string(char *,int )> call_back){
         io_context = std::make_shared<asio::io_context>();
         th = std::make_shared<std::thread>([&](){
             tcp::acceptor a(*io_context, tcp::endpoint(tcp::v4(), port));
@@ -122,7 +119,7 @@ public:
             tcp::socket s(*io_context);
             int cnt = 0;
             while (1) {
-                if (cnt++ > 5) return;
+                if (cnt++ > 5) return "";
                 try {
                     asio::connect(s, tcp::resolver(*io_context).resolve(ip.data(), port.data()));
                 }
