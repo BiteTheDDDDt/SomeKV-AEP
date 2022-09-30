@@ -1,6 +1,5 @@
 #if !defined(phmap_h_guard_)
 #define phmap_h_guard_
-#define PHMAP_USE_ABSL_HASH
 // ---------------------------------------------------------------------------
 // Copyright (c) 2019, Gregory Popovitch - greg7mdp@gmail.com
 //

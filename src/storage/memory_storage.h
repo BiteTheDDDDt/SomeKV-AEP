@@ -10,12 +10,9 @@
 #include <list>
 #include <string_view>
 
-#include "absl/hash/hash.h"
 #include "parallel_hashmap/phmap.h"
 #include "utils/common.h"
 #include "utils/schema.h"
-
-constexpr int WRITE_LOG_TIMES = (1 << 16) - 1;
 
 class MemoryStorage {
     using Container = std::vector<Schema::Row>;
@@ -31,7 +28,6 @@ public:
     MemoryStorage() { _datas.reserve(MAX_ROW_SIZE); }
 
     void write(const Schema::Row* row) {
-        if (_datas.size() > WRITE_LOG_TIMES) return;
         Offset offset;
         std::string_view user_id;
         {

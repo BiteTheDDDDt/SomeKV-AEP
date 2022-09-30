@@ -6,8 +6,6 @@
 #include <cstddef>
 #include <cstdlib>
 
-#include "io/readable_file.h"
-#include "storage/disk_storage.h"
 #include "storage/memory_storage.h"
 #include "storage/pmem_storage.h"
 #include "utils/common.h"
