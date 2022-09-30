@@ -100,6 +100,7 @@ public:
         std::string result;
         for(int i=0;i<this->peer_host.size();i++){
             //res +=
+            continue;
             result+= netio->sent(this->peer_host[i].first,this->peer_host[i].second,a,30 + column_key_len); // TODO 这里要把上述参数转化为字符串
         }
         int length = result.length();
