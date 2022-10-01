@@ -104,6 +104,10 @@ public:
         memcpy(a+20,en_code_int(column_key_len).c_str(),10);
         memcpy(a+30,column_key,column_key_len);
         std::string result;
+        LOG(INFO) << "st self query\n";
+        result+= netio->sent("127.0.0.1",host,a,30 + column_key_len);
+        LOG(INFO) << "en self query\n";
+
         for(int i=0;i<this->peer_host.size();i++){
             //res +=
            // continue;
