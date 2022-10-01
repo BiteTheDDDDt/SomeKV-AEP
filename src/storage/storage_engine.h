@@ -37,19 +37,19 @@ public:
         int x = host.find_first_of(":");
         std::string port = host.substr(x+1, host.length()-x);
         LOG(INFO) << "port: " << port << "\n";
-//        netio = std::make_shared<NetworkIO>(stoi(port),[&](char * data,int x){ //这里得加上个长度！！！
-//            int32_t select_column = std::stoi(std::string(data,10));
-//            int32_t where_column = std::stoi(std::string(data+10,10));
-//            std::string column_key = std::string(data+30,x-30);
-//            size_t column_key_len = std::stoi(std::string(data+20,10));
-//            int xx = 4 + 4 + 4 + column_key_len;
-//            char * r = new char [xx*100];
-//            int cnt  = read_local(select_column,where_column,column_key.data(),column_key_len,r); // todo 这里要加入把x解析成许多参数
-//            //返回的是个数 * size
-//            std::string ret = std::string(r,cnt*xx);
-//            delete [] r;
-//            return ret; //TODO 改
-//        });
+        netio = std::make_shared<NetworkIO>(stoi(port),[&](char * data,int x){ //这里得加上个长度！！！
+            int32_t select_column = std::stoi(std::string(data,10));
+            int32_t where_column = std::stoi(std::string(data+10,10));
+            std::string column_key = std::string(data+30,x-30);
+            size_t column_key_len = std::stoi(std::string(data+20,10));
+            int xx = 4 + 4 + 4 + column_key_len;
+            char * r = new char [xx*100];
+            int cnt  = read_local(select_column,where_column,column_key.data(),column_key_len,r); // todo 这里要加入把x解析成许多参数
+            //返回的是个数 * size
+            std::string ret = std::string(r,cnt*xx);
+            delete [] r;
+            return ret; //TODO 改
+        });
 
         LOG(INFO) << "Create StorageEngine. _storage_path=" << _storage_path;
     }
