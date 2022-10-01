@@ -23,7 +23,7 @@ class StorageEngine {
 public:
     StorageEngine(std::string host,std::vector<std::string>peer_host,const std::string& aep_dir, const std::string& disk_dir)
             : _storage_path(aep_dir + WAL_PATH_SUFFIX) {
-        this->host = host;
+        //this->host = host;
         for (size_t i = 0; i < BUCKET_NUMBER; i++) {
             std::string sub_path = _storage_path + "." + std::to_string(i);
             _wal[i] = new PmemStorage(sub_path, _memtable);
@@ -38,6 +38,7 @@ public:
         int x = host.find_first_of(":");
         std::string port = host.substr(x+1, host.length()-x);
         LOG(INFO) << "port: " << port << "\n";
+        this->port = port;
         netio = std::make_shared<NetworkIO>(stoi(port),[&](char * data,int x){ //这里得加上个长度！！！
             LOG(INFO) << "do call back\n";
             int32_t select_column = std::stoi(std::string(data,10));
@@ -106,7 +107,7 @@ public:
         memcpy(a+30,column_key,column_key_len);
         std::string result;
         LOG(INFO) << "st self query\n";
-        result+= netio->sent("127.0.0.1",host,a,30 + column_key_len);
+        result+= netio->sent("127.0.0.1",port,a,30 + column_key_len);
         LOG(INFO) << "en self query\n";
 
         for(int i=0;i<this->peer_host.size();i++){
@@ -137,6 +138,7 @@ private:
     MemoryStorage _memtable;
     PmemStorage* _wal[BUCKET_NUMBER];
     std::string host;
+    std::string port;
     std::vector<std::pair<std::string,std::string> > peer_host;
     std::shared_ptr<NetworkIO> netio;
     std::mutex mu;
