@@ -129,7 +129,7 @@ public:
                     LOG(INFO) << "connect  en"<< cnt << "\n";
                 }
                 catch (std::exception &e) {
-                    LOG(INFO) <<e.what()<<"\n";
+                    LOG(INFO) << "err " <<e.what()<<"\n";
                     std::this_thread::sleep_for(std::chrono::milliseconds(20));
                     continue;
                 }
