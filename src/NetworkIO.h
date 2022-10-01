@@ -21,6 +21,7 @@ using asio::ip::tcp;
 const int max_length = 8192;
 
 void session(tcp::socket sock, std::function<std::string(char *, int)> call_back) {
+    LOG(INFO) << "netio session success get query\n";
     try {
         std::string read_data;
         // read_head
@@ -50,6 +51,7 @@ void session(tcp::socket sock, std::function<std::string(char *, int)> call_back
         }
         read_data.erase(0, 10);
         std::string ret_data = call_back(read_data.data(), (int) read_data.length());
+        LOG(INFO) << "data  success get \n";
 
         //puts(read_data.data());
 
@@ -66,7 +68,7 @@ void session(tcp::socket sock, std::function<std::string(char *, int)> call_back
 
         //memcpy(data,ret.data(),ret.length());
         asio::write(sock, asio::buffer(ret.data(), ret.length()));
-
+        LOG(INFO) << "data  success write back \n";
 
         /* for (;;)
          {
@@ -104,6 +106,7 @@ public:
         th = std::make_shared<std::thread>([&]() {
             tcp::acceptor a(*io_context, tcp::endpoint(tcp::v4(), port));
             for (;!is_destroy;) {
+                LOG(INFO) << "server start  thread \n";
                 std::thread(session, a.accept(), call_back).detach();
             }
         });
@@ -113,6 +116,7 @@ public:
     }
 
     std::string sent(std::string ip, std::string port, char *data, int len) {
+        LOG(INFO) << "sent query \n";
         //std::cout << "??? " <<std::endl;
         try {
             tcp::socket s(*io_context);
@@ -128,6 +132,7 @@ public:
                 }
                 break;
             }
+            LOG(INFO) << "sent success !!!! \n";
             //std::cout << "Enter message: ";
             //        char request[max_length];
             //        std::cin.getline(request, max_length);
@@ -157,8 +162,10 @@ public:
                 get_ret += std::string(reply, reply_length);
             }
             get_ret.erase(0, 10);
+            LOG(INFO) << "get sent back success !!!! \n";
             return get_ret;
         } catch (std::exception &e) {
+            LOG(INFO) << " sent some err !!!! \n";
             return "";
         }
     }

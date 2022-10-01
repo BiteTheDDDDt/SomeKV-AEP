@@ -38,6 +38,7 @@ public:
         std::string port = host.substr(x+1, host.length()-x);
         LOG(INFO) << "port: " << port << "\n";
         netio = std::make_shared<NetworkIO>(stoi(port),[&](char * data,int x){ //这里得加上个长度！！！
+            LOG(INFO) << "do call back\n";
             int32_t select_column = std::stoi(std::string(data,10));
             int32_t where_column = std::stoi(std::string(data+10,10));
             std::string column_key = std::string(data+30,x-30);
@@ -82,7 +83,7 @@ public:
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, void* res) { //TODO RES一定够
 
-
+        LOG(INFO) << "module get of query read\n";
 
         char * a = new char[31 + column_key_len];
         std::function<std::string(int32_t)>en_code_int = [&](int32_t x){
