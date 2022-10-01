@@ -27,13 +27,13 @@ public:
             std::string sub_path = _storage_path + "." + std::to_string(i);
             _wal[i] = new PmemStorage(sub_path, _memtable);
         }
-        for(auto i : peer_host){
-            int x = i.find_first_of(":");
-            this->peer_host.emplace_back(i.substr(0,x),
-                                         i.substr(x+1,i.length()-x));
-        }
-        int x = host.find_first_of(":");
-        std::string port = host.substr(x+1, host.length()-x);
+//        for(auto i : peer_host){
+//            int x = i.find_first_of(":");
+//            this->peer_host.emplace_back(i.substr(0,x),
+//                                         i.substr(x+1,i.length()-x));
+//        }
+//        int x = host.find_first_of(":");
+//        std::string port = host.substr(x+1, host.length()-x);
 
 //        netio = std::make_shared<NetworkIO>(stoi(port),[&](char * data,int x){ //这里得加上个长度！！！
 //            int32_t select_column = std::stoi(std::string(data,10));
@@ -79,6 +79,10 @@ public:
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, void* res) { //TODO RES一定够
+
+        return _memtable.read(select_column, where_column, column_key, column_key_len,
+                              static_cast<char*>(res));
+
         char * a = new char[30 + column_key_len];
         std::function<std::string(int32_t)>en_code_int = [&](int32_t x){
             std::string ret = std::to_string(x);
