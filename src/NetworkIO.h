@@ -124,10 +124,12 @@ public:
             while (1) {
                 if (cnt++ > 5) return "";
                 try {
+                    LOG(INFO) << "connect  st "<< cnt << " "<< ip <<" "<<port <<"\n";
                     asio::connect(s, tcp::resolver(*io_context).resolve(ip.data(), port.data()));
+                    LOG(INFO) << "connect  en"<< cnt << "\n";
                 }
                 catch (std::exception &e) {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(20));
                     continue;
                 }
                 break;
