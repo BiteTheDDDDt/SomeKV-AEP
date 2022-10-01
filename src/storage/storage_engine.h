@@ -48,7 +48,7 @@ public:
             //返回的是个数 * size
             std::string ret = std::string(r,cnt*xx);
             delete [] r;
-            return ret; //TODO 改
+            return ret;
         });
 
         LOG(INFO) << "Create StorageEngine. _storage_path=" << _storage_path;
@@ -82,10 +82,9 @@ public:
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, void* res) { //TODO RES一定够
 
-        return _memtable.read(select_column, where_column, column_key, column_key_len,
-                              static_cast<char*>(res));
 
-        char * a = new char[30 + column_key_len];
+
+        char * a = new char[31 + column_key_len];
         std::function<std::string(int32_t)>en_code_int = [&](int32_t x){
             std::string ret = std::to_string(x);
             while(ret.length() !=10)
@@ -106,7 +105,7 @@ public:
         std::string result;
         for(int i=0;i<this->peer_host.size();i++){
             //res +=
-            continue;
+           // continue;
             result+= netio->sent(this->peer_host[i].first,this->peer_host[i].second,a,30 + column_key_len); // TODO 这里要把上述参数转化为字符串
         }
         int length = result.length();

@@ -110,6 +110,7 @@ public:
                 std::thread(session, a.accept(),call_back).detach();
             }
         });
+
         //this->call_back = call_back;
     }
     std::string sent(std::string ip,std::string port,char * data,int len) {
