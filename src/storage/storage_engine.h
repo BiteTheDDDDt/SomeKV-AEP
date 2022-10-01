@@ -27,14 +27,16 @@ public:
             std::string sub_path = _storage_path + "." + std::to_string(i);
             _wal[i] = new PmemStorage(sub_path, _memtable);
         }
-//        for(auto i : peer_host){
-//            int x = i.find_first_of(":");
-//            this->peer_host.emplace_back(i.substr(0,x),
-//                                         i.substr(x+1,i.length()-x));
-//        }
-//        int x = host.find_first_of(":");
-//        std::string port = host.substr(x+1, host.length()-x);
-
+        for(auto i : peer_host){
+            LOG(INFO) << "host "<<host << "peer host  "<< i << "\n";
+            int x = i.find_first_of(":");
+            LOG(INFO) << "peerip  "<<i.substr(0,x) << "peer port  "<< i.substr(x+1,i.length()-x) << "\n";
+            this->peer_host.emplace_back(i.substr(0,x),
+                                         i.substr(x+1,i.length()-x));
+        }
+        int x = host.find_first_of(":");
+        std::string port = host.substr(x+1, host.length()-x);
+        LOG(INFO) << "port: " << port << "\n";
 //        netio = std::make_shared<NetworkIO>(stoi(port),[&](char * data,int x){ //这里得加上个长度！！！
 //            int32_t select_column = std::stoi(std::string(data,10));
 //            int32_t where_column = std::stoi(std::string(data+10,10));
