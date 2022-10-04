@@ -166,15 +166,19 @@ public:
             LOG(INFO) << "where is sig err "<< 9 <<  "\n";
             std::string get_ret;
             LOG(INFO) << "where is sig err "<< 10 <<  "\n";
+            LOG(INFO) << "where is sig err "<< 10.1 <<": " << get_ret<<"\n";
             while (get_ret.size() < 10) {
+                LOG(INFO) << "where is sig err "<< 10.2 <<": " << "<10"<<"\n";
                 size_t reply_length = asio::read(s,
                                                  asio::buffer(reply, 65535));
+                LOG(INFO) << "where is sig err "<< 10.3 <<": " << reply_length <<"???" <<std::string(reply, reply_length) <<"\n";
                 get_ret += std::string(reply, reply_length);
             }
             LOG(INFO) << "where is sig err "<< 11 <<  "\n";
             int x = std::stoi(get_ret.substr(2, 8));
             LOG(INFO) << "where is sig err "<< 12 <<  "\n";
             while (get_ret.size() < 10 + x) {
+
                 size_t reply_length = asio::read(s, asio::buffer(reply, 65535));
                 get_ret += std::string(reply, reply_length);
             }
