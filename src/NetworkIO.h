@@ -116,7 +116,7 @@ public:
     }
 
     std::string sent(std::string ip, std::string port, char *data, int len) {
-        LOG(INFO) << "sent query \n";
+        LOG(INFO) << "sent query "<<ip<<" "<< port <<"\n";
         //std::cout << "??? " <<std::endl;
         try {
             tcp::socket s(*io_context);

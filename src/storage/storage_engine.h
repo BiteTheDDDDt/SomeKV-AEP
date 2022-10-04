@@ -85,7 +85,8 @@ public:
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, void* res) { //TODO RES一定够
 
-        LOG(INFO) << "module get of query read\n";
+        LOG(INFO) << "module get of query read: "<< select_column <<" "<< where_column <<" "<<
+        std::string((char*)(column_key),column_key_len );
 
         char * a = new char[31 + column_key_len];
         std::function<std::string(int32_t)>en_code_int = [&](int32_t x){
@@ -120,7 +121,8 @@ public:
         int cnt = length / xx;
       //  char * local_res;
          cnt += _memtable.read(select_column, where_column, column_key, column_key_len,
-                       static_cast<char*>(res)+ length); //长度要重新算
+                       static_cast<char*>(res)+ length); //长度要重新
+       LOG(INFO) << "all cnt:"<<cnt <<"\n";
         return cnt; // 个数
     }
 
