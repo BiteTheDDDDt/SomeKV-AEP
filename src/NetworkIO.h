@@ -194,6 +194,7 @@ public:
     ~NetworkIO(){
         LOG(INFO) << "start destroy\n";
         is_destroy = true;
+        this->io_context->stop();
         th->join();
         LOG(INFO) << "end destroy\n";
     }
