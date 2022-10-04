@@ -168,14 +168,14 @@ public:
             LOG(INFO) << "where is sig err "<< 10 <<  "\n";
             while (get_ret.size() < 10) {
                 size_t reply_length = asio::read(s,
-                                                 asio::buffer(reply, 10));
+                                                 asio::buffer(reply, 65535));
                 get_ret += std::string(reply, reply_length);
             }
             LOG(INFO) << "where is sig err "<< 11 <<  "\n";
             int x = std::stoi(get_ret.substr(2, 8));
             LOG(INFO) << "where is sig err "<< 12 <<  "\n";
             while (get_ret.size() < 10 + x) {
-                size_t reply_length = asio::read(s, asio::buffer(reply, std::min(x, max_length)));
+                size_t reply_length = asio::read(s, asio::buffer(reply, 65535));
                 get_ret += std::string(reply, reply_length);
             }
             LOG(INFO) << "where is sig err "<< 13 <<  "\n";
