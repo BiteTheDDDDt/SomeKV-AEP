@@ -26,7 +26,7 @@ public:
         //this->host = host;
         for (size_t i = 0; i < BUCKET_NUMBER; i++) {
             std::string sub_path = _storage_path + "." + std::to_string(i);
-           // _wal[i] = new PmemStorage(sub_path, _memtable);
+            _wal[i] = new PmemStorage(sub_path, _memtable);
         }
         for(auto i : peer_host){
             LOG(INFO) << "host "<<host << "peer host  "<< i << "\n";
@@ -69,12 +69,12 @@ public:
     void write(const void* data) {
         std::unique_lock<std::mutex>lock(mu);
         const Schema::Row* row_ptr = static_cast<const Schema::Row*>(data);
-      //  _memtable.write(row_ptr);
+        _memtable.write(row_ptr);
         if (wal_id == -1) {
             wal_id = wal_number++;
         }
 
-       // _wal[wal_id]->write(row_ptr);
+        _wal[wal_id]->write(row_ptr);
 
         /*for(auto i : peer_host){
             netio->sent(i.first,i.second,static_cast<char *> data,272);
@@ -119,8 +119,8 @@ public:
         int xx = 4 + 4 + 4 + column_key_len;
         int cnt = length / xx;
       //  char * local_res;
-        /* cnt += _memtable.read(select_column, where_column, column_key, column_key_len,
-                       static_cast<char*>(res)+ length); //长度要重新算*/
+         cnt += _memtable.read(select_column, where_column, column_key, column_key_len,
+                       static_cast<char*>(res)+ length); //长度要重新算
         return cnt; // 个数
     }
 
