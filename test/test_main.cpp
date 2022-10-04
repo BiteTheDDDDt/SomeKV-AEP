@@ -27,8 +27,14 @@ void test_recover(size_t row_number_stage1, size_t row_number_stage2) {
 
         rows[i].salary = salary;
     }
+    char **a ;
+    a[0] = new char[15];
+    memcpy(a[0],"127.0.0.1:15001",sizeof("127.0.0.1:15001"));
 
-    void* ctx = engine_init(nullptr, nullptr, 0, AEP_DIR, DISK_DIR);
+
+    void* ctx = engine_init("127.0.0.1:15000", a, 1, AEP_DIR, DISK_DIR);
+
+    LOG(INFO)<<" succc init" << std::endl;
 
     for (int i = 0; i < row_number_stage1; i++) {
         engine_write(ctx, &rows[i], Schema::ROW_LENGTH);
@@ -130,6 +136,7 @@ void test_recover(size_t row_number_stage1, size_t row_number_stage2) {
     engine_deinit(ctx);
 }
 int main() {
+    LOG(INFO) << "start";
     test_recover(10, 10);
 
     LOG(INFO) << "pass all check";

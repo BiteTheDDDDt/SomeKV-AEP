@@ -68,7 +68,7 @@ void session(tcp::socket sock, std::function<std::string(char *, int)> call_back
 
         //memcpy(data,ret.data(),ret.length());
         asio::write(sock, asio::buffer(ret.data(), ret.length()));
-        LOG(INFO) << "data  success write back \n";
+        LOG(INFO) << "data  success write back " << ret << std::endl;
 
         /* for (;;)
          {
@@ -103,13 +103,13 @@ public:
     NetworkIO(int port, std::function<std::string(char *, int)> call_back) {
         io_context = std::make_shared<asio::io_context>();
         is_destroy = false;
-        th = std::make_shared<std::thread>([&](int port) {
+        th = std::make_shared<std::thread>([&](int port, std::function<std::string(char *, int)> call_back) {
             tcp::acceptor a(*io_context, tcp::endpoint(tcp::v4(), port));
             for (;!is_destroy;) {
                 LOG(INFO) << "server start  thread \n";
                 std::thread(session, a.accept(), call_back).detach();
             }
-        },port);
+        },port,call_back);
 
         LOG(INFO) << "netio success build\n";
         //this->call_back = call_back;
@@ -170,7 +170,7 @@ public:
             while (get_ret.size() < 10) {
                 LOG(INFO) << "where is sig err "<< 10.2 <<": " << "<10"<<"\n";
                 size_t reply_length = asio::read(s,
-                                                 asio::buffer(reply, 65535));
+                                                 asio::buffer(reply, 10));
                 LOG(INFO) << "where is sig err "<< 10.3 <<": " << reply_length <<"???" <<std::string(reply, reply_length) <<"\n";
                 get_ret += std::string(reply, reply_length);
             }
@@ -179,7 +179,7 @@ public:
             LOG(INFO) << "where is sig err "<< 12 <<  "\n";
             while (get_ret.size() < 10 + x) {
 
-                size_t reply_length = asio::read(s, asio::buffer(reply, 65535));
+                size_t reply_length = asio::read(s, asio::buffer(reply, x));
                 get_ret += std::string(reply, reply_length);
             }
             LOG(INFO) << "where is sig err "<< 13 <<  "\n";
@@ -187,7 +187,7 @@ public:
             LOG(INFO) << "get sent back success !!!! \n";
             return get_ret;
         } catch (std::exception &e) {
-            LOG(INFO) << " sent some err !!!! \n";
+            LOG(INFO) << " sent some err !!!! " << e.what() <<"\n";
             return "";
         }
     }
