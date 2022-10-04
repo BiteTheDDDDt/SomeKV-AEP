@@ -36,7 +36,7 @@ public:
                                          i.substr(x+1,i.length()-x));
         }
         int x = host.find_first_of(":");
-        std::string port = host.substr(x+1, host.length()-x);
+        std::string port = host.substr(x+1, host.length()-x-1);
         LOG(INFO) << "port: " << port << "\n";
         this->port = port;
         netio = std::make_shared<NetworkIO>(stoi(port),[&](char * data,int x){ //这里得加上个长度！！！

@@ -103,13 +103,13 @@ public:
     NetworkIO(int port, std::function<std::string(char *, int)> call_back) {
         io_context = std::make_shared<asio::io_context>();
         is_destroy = false;
-        th = std::make_shared<std::thread>([&]() {
+        th = std::make_shared<std::thread>([&](int port) {
             tcp::acceptor a(*io_context, tcp::endpoint(tcp::v4(), port));
             for (;!is_destroy;) {
                 LOG(INFO) << "server start  thread \n";
                 std::thread(session, a.accept(), call_back).detach();
             }
-        });
+        },port);
 
         LOG(INFO) << "netio success build\n";
         //this->call_back = call_back;
