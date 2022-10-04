@@ -124,67 +124,67 @@ public:
             while (1) {
                 if (cnt++ > 5) return "";
                 try {
-                    LOG(INFO) << "connect  st "<< cnt << " "<< ip <<" "<<port <<"\n";
+                  //  LOG(INFO) << "connect  st "<< cnt << " "<< ip <<" "<<port <<"\n";
                     asio::connect(s, tcp::resolver(*io_context).resolve(ip.data(), port.data()));
-                    LOG(INFO) << "connect  en"<< cnt << "\n";
+                //    LOG(INFO) << "connect  en"<< cnt << "\n";
                 }
                 catch (std::exception &e) {
-                    LOG(INFO) << "err " <<e.what()<<"\n";
+                 //   LOG(INFO) << "err " <<e.what()<<"\n";
                     std::this_thread::sleep_for(std::chrono::milliseconds(20));
                     continue;
                 }
                 break;
             }
 
-            LOG(INFO) << "sent success !!!! \n";
+          //  LOG(INFO) << "sent success !!!! \n";
             int seg_cnt = 0;
-            LOG(INFO) << "where is sig err "<< 1 <<  "\n";
+         //   LOG(INFO) << "where is sig err "<< 1 <<  "\n";
                       //std::cout << "Enter message: ";
             //        char request[max_length];
             //        std::cin.getline(request, max_length);
             //        size_t request_length = std::strlen(request);
             char *sent_data = new char[len + 10];
-            LOG(INFO) << "where is sig err "<< 2<<  "\n";
+          //  LOG(INFO) << "where is sig err "<< 2<<  "\n";
 
             std::string sss = std::to_string(len);
-            LOG(INFO) << "where is sig err "<< 3 <<  "\n";
+           // LOG(INFO) << "where is sig err "<< 3 <<  "\n";
             while (sss.length() < 8) {
                 sss = "0" + sss;
             }
             sss = "aa" + sss;
-            LOG(INFO) << "where is sig err "<< 4 <<  "\n";
+          //  LOG(INFO) << "where is sig err "<< 4 <<  "\n";
             memcpy(sent_data, sss.data(), 10);
-            LOG(INFO) << "where is sig err "<< 5 <<  "\n";
+          //  LOG(INFO) << "where is sig err "<< 5 <<  "\n";
             memcpy(sent_data + 10, data, len);
-            LOG(INFO) << "where is sig err "<< 6<<  "\n";
+          //  LOG(INFO) << "where is sig err "<< 6<<  "\n";
             asio::write(s, asio::buffer(sent_data, len + 10));
-            LOG(INFO) << "where is sig err "<<7<<  "\n";
+         //   LOG(INFO) << "where is sig err "<<7<<  "\n";
             delete[] sent_data;
-            LOG(INFO) << "where is sig err "<< 8 <<  "\n";
+         //   LOG(INFO) << "where is sig err "<< 8 <<  "\n";
             //std::cout << "sent ok " << std::endl;
             char reply[max_length];
-            LOG(INFO) << "where is sig err "<< 9 <<  "\n";
+          //  LOG(INFO) << "where is sig err "<< 9 <<  "\n";
             std::string get_ret;
-            LOG(INFO) << "where is sig err "<< 10 <<  "\n";
-            LOG(INFO) << "where is sig err "<< 10.1 <<": " << get_ret<<"\n";
+           // LOG(INFO) << "where is sig err "<< 10 <<  "\n";
+           // LOG(INFO) << "where is sig err "<< 10.1 <<": " << get_ret<<"\n";
             while (get_ret.size() < 10) {
-                LOG(INFO) << "where is sig err "<< 10.2 <<": " << "<10"<<"\n";
+            //    LOG(INFO) << "where is sig err "<< 10.2 <<": " << "<10"<<"\n";
                 size_t reply_length = asio::read(s,
                                                  asio::buffer(reply, 10));
-                LOG(INFO) << "where is sig err "<< 10.3 <<": " << reply_length <<"???" <<std::string(reply, reply_length) <<"\n";
+            //    LOG(INFO) << "where is sig err "<< 10.3 <<": " << reply_length <<"???" <<std::string(reply, reply_length) <<"\n";
                 get_ret += std::string(reply, reply_length);
             }
-            LOG(INFO) << "where is sig err "<< 11 <<  "\n";
+         //   LOG(INFO) << "where is sig err "<< 11 <<  "\n";
             int x = std::stoi(get_ret.substr(2, 8));
-            LOG(INFO) << "where is sig err "<< 12 <<  "\n";
+         //   LOG(INFO) << "where is sig err "<< 12 <<  "\n";
             while (get_ret.size() < 10 + x) {
 
                 size_t reply_length = asio::read(s, asio::buffer(reply, x));
                 get_ret += std::string(reply, reply_length);
             }
-            LOG(INFO) << "where is sig err "<< 13 <<  "\n";
+          //  LOG(INFO) << "where is sig err "<< 13 <<  "\n";
             get_ret.erase(0, 10);
-            LOG(INFO) << "get sent back success !!!! \n";
+           // LOG(INFO) << "get sent back success !!!! \n";
             return get_ret;
         } catch (std::exception &e) {
             LOG(INFO) << " sent some err !!!! " << e.what() <<"\n";
