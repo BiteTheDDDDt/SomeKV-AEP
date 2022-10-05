@@ -96,18 +96,20 @@ struct NetworkIO {
     std::shared_ptr<asio::io_context> io_context;
     std::shared_ptr<std::thread> th;
     int is_destroy = false;
+    tcp::acceptor * acceptor;
     //std::function<std::vector<std::string>(char *)>call_back;
 
 private:
 public:
     NetworkIO(int port, std::function<std::string(char *, int)> call_back) {
         io_context = std::make_shared<asio::io_context>();
+
         is_destroy = false;
         th = std::make_shared<std::thread>([&](int port, std::function<std::string(char *, int)> call_back) {
-            tcp::acceptor a(*io_context, tcp::endpoint(tcp::v4(), port));
+            acceptor = new tcp::acceptor (*io_context, tcp::endpoint(tcp::v4(), port));
             for (;!is_destroy;) {
                 LOG(INFO) << "server start  thread \n";
-                std::thread(session, a.accept(), call_back).detach();
+                std::thread(session, acceptor->accept(), call_back).detach();
             }
         },port,call_back);
 
@@ -192,9 +194,17 @@ public:
         }
     }
     ~NetworkIO(){
+        std::cout <<"??"<< std::endl;
         LOG(INFO) << "start destroy\n";
         is_destroy = true;
-        this->io_context->stop();
+        try {
+            if(acceptor != nullptr)
+                acceptor->cancel();
+            this->io_context->stop();
+        }catch (std::exception &e){
+            LOG(INFO) << e.what();
+        }
+      //  delete acceptor;
         th->join();
         LOG(INFO) << "end destroy\n";
     }
