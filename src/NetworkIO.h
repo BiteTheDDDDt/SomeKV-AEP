@@ -105,8 +105,9 @@ public:
         io_context = std::make_shared<asio::io_context>();
 
         is_destroy = false;
+        acceptor = new tcp::acceptor (*io_context, tcp::endpoint(tcp::v4(), port));
         th = std::make_shared<std::thread>([&](int port, std::function<std::string(char *, int)> call_back) {
-            acceptor = new tcp::acceptor (*io_context, tcp::endpoint(tcp::v4(), port));
+
             for (;!is_destroy;) {
                 LOG(INFO) << "server start  thread \n";
                 std::thread(session, acceptor->accept(), call_back).detach();
