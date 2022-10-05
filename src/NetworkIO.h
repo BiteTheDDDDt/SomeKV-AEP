@@ -198,12 +198,14 @@ public:
         LOG(INFO) << "start destroy\n";
         is_destroy = true;
         try {
+
             if(acceptor != nullptr)
-                acceptor->cancel();
+                asio::post(acceptor->get_executor(), [this] { acceptor->cancel(); });
             this->io_context->stop();
         }catch (std::exception &e){
             LOG(INFO) << e.what();
         }
+
       //  delete acceptor;
         th->join();
         LOG(INFO) << "end destroy\n";
