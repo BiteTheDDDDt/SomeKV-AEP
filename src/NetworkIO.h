@@ -9,12 +9,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include "asio.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <thread>
 #include <utility>
-#include "asio.hpp"
+#include "asio/error_code.hpp"
+#include "utils/asio.hpp"
 
 using asio::ip::tcp;
 
@@ -32,7 +32,7 @@ void session(tcp::socket sock, std::function<std::string(char *, int)> call_back
             size_t length = sock.read_some(asio::buffer(data), error);
             read_data += std::string(data, length);
             if (error == asio::error::eof)
-                break; // Connection closed cleanly by peer.
+                return;
             else if (error)
                 throw asio::system_error(error); // Some other error.
         }
@@ -98,10 +98,11 @@ struct NetworkIO {
     int is_destroy = false;
     tcp::acceptor * acceptor;
     //std::function<std::vector<std::string>(char *)>call_back;
-
 private:
+    int _port;
 public:
     NetworkIO(int port, std::function<std::string(char *, int)> call_back) {
+        _port=port;
         io_context = std::make_shared<asio::io_context>();
 
         is_destroy = false;
@@ -138,7 +139,9 @@ public:
                 }
                 break;
             }
-
+        if(!len){
+            return "";
+        }
           //  LOG(INFO) << "sent success !!!! \n";
             int seg_cnt = 0;
          //   LOG(INFO) << "where is sig err "<< 1 <<  "\n";
@@ -198,11 +201,14 @@ public:
         std::cout <<"??"<< std::endl;
         LOG(INFO) << "start destroy\n";
         is_destroy = true;
+        sent("127.0.0.1",std::to_string(_port),nullptr,0);
         try {
-
-            if(acceptor != nullptr)
-                asio::post(acceptor->get_executor(), [this] { acceptor->cancel(); });
-            this->io_context->stop();
+            asio::error_code err;
+            acceptor->cancel(err);
+            LOG(INFO)<<err;
+            acceptor->close(err);
+            LOG(INFO)<<err;
+            io_context->stop();
         }catch (std::exception &e){
             LOG(INFO) << e.what();
         }

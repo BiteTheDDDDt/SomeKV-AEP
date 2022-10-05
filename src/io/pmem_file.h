@@ -30,8 +30,9 @@ public:
 
         close(fd);
 
-        if ((_header = reinterpret_cast<char*>(
-                     pmem_map_file(path.data(), 0, 0, 0666, &_mapped_len, &_is_pmem))) == nullptr) {
+        if (_header = reinterpret_cast<char*>(
+                    pmem_map_file(path.data(), 0, 0, 0666, &_mapped_len, &_is_pmem));
+            _header == nullptr) {
             perror("pmem_map_file");
             LOG(FATAL) << "pmem_map_file fail.";
         }

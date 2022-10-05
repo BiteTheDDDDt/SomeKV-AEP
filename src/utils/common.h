@@ -17,7 +17,11 @@ constexpr const size_t WRITE_FILE_BUFFER_SIZE = 1;
 
 constexpr size_t BUCKET_NUMBER = 50;
 
+#ifdef MAKE_TEST
+constexpr size_t MAX_ROW_SIZE = 500;
+#else
 constexpr size_t MAX_ROW_SIZE = 50000000;
+#endif
 
 inline uint64_t get_file_size(std::string path) {
     struct ::stat file_stat;
