@@ -22,8 +22,11 @@ void* engine_init(const char* host_info, const char* const* peer_host_info,
                   size_t peer_host_info_num, const char* aep_dir, const char* disk_dir) {
     std::string hostip(host_info);
     std::vector<std::string> peer_ip_port;
-    for (size_t i = 0; i < peer_host_info_num; i++)
+    LOG(INFO) << "peer_host_info_num=" << peer_host_info_num;
+    for (size_t i = 0; i < peer_host_info_num; i++) {
         peer_ip_port.push_back(std::string(peer_host_info[i]));
+        LOG(INFO) << peer_ip_port.back();
+    }
 
     return StorageEngineFactory::get_storage_engine(aep_dir, disk_dir, hostip, peer_ip_port);
 }

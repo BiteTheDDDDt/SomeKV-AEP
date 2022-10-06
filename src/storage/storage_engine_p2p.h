@@ -11,15 +11,15 @@ public:
     StorageEngineP2P(std::string host, std::vector<std::string> peer_host,
                      const std::string& aep_dir, const std::string& disk_dir)
             : _local(aep_dir, disk_dir) {
-        for (auto i : peer_host) {
-            int x = i.find_first_of(":");
-            _peer_host.emplace_back(i.substr(0, x), i.substr(x + 1, i.length() - x - 1));
+        for (auto peer : peer_host) {
+            int x = peer.find_first_of(":");
+            _peer_host.emplace_back(peer.substr(0, x), peer.substr(x + 1, peer.length() - x - 1));
         }
         int x = host.find_first_of(":");
         _port = host.substr(x + 1, host.length() - x - 1);
         _remote = std::make_shared<NetworkIO>(stoi(_port), _local);
 
-        LOG(INFO) << "init StorageEngineP2P:" << host;
+        LOG(INFO) << "init StorageEngineP2P: " << host << " ,peer_size=" << _peer_host.size();
     }
 
     ~StorageEngineP2P() = default;
