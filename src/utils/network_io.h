@@ -65,6 +65,7 @@ public:
     }
 
     void receive(tcp::socket sock) {
+        LOG(INFO) << "receive query";
         try {
             char buffer[MAX_QUERY_BUFFER_LENGTH];
 
@@ -78,6 +79,10 @@ public:
                         LOG(WARNING) << "Query length more than buffer size.";
                     }
                     size_t length = sock.read_some(asio::buffer(head, remain_buffer_length), error);
+                    if (!length) {
+                        break;
+                    }
+
                     head += length;
                     remain_buffer_length -= length;
                 }
@@ -93,7 +98,6 @@ public:
 
                 decode_query(select_column, where_column, column_key, column_key_len, buffer);
 
-                LOG(INFO) << "receive query";
                 print_query(select_column, where_column, column_key, column_key_len);
 
                 int cnt =
