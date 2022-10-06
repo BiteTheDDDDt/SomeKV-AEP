@@ -18,6 +18,8 @@ public:
         int x = host.find_first_of(":");
         _port = host.substr(x + 1, host.length() - x - 1);
         _remote = std::make_shared<NetworkIO>(stoi(_port), _local);
+
+        LOG(INFO) << "init StorageEngineP2P:" << host;
     }
 
     ~StorageEngineP2P() = default;
@@ -32,11 +34,16 @@ public:
         size_t length =
                 encode_query(select_column, where_column, column_key, column_key_len, buffer);
 
+        LOG(INFO) << "send query";
+        print_query(select_column, where_column, column_key, column_key_len);
+
         size_t cnt = 0;
 
         for (size_t i = 0; i < _peer_host.size(); i++) {
-            cnt += _remote->read_remote(_peer_host[i].first, _peer_host[i].second, buffer, length,
-                                        (char*)res);
+            int remote_cnt = _remote->read_remote(_peer_host[i].first, _peer_host[i].second, buffer,
+                                                  length, (char*)res);
+            LOG(INFO) << "remote_cnt=" << remote_cnt << " ,peer=" << _peer_host[i].first;
+            cnt += remote_cnt;
         }
         cnt += _local.read(select_column, where_column, column_key, column_key_len, res);
 

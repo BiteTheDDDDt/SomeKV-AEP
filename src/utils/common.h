@@ -91,6 +91,13 @@ inline void print_meminfo() {
     pclose(output);
 }
 
+inline void print_query(int32_t select_column, int32_t where_column, const void* column_key,
+                        size_t column_key_len) {
+    LOG(INFO) << "select_column=" << select_column << ", where_column=" << where_column
+              << ", column_key=" << std::string((char*)column_key, column_key_len)
+              << ", column_key_len=" << column_key_len;
+}
+
 inline size_t encode_query(int32_t select_column, int32_t where_column, const void* column_key,
                            size_t column_key_len, char* buffer) {
     int offset = 0;

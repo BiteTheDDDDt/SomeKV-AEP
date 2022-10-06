@@ -93,11 +93,15 @@ public:
 
                 decode_query(select_column, where_column, column_key, column_key_len, buffer);
 
+                LOG(INFO) << "receive query";
+                print_query(select_column, where_column, column_key, column_key_len);
+
                 int cnt =
                         _local.read(select_column, where_column, column_key, column_key_len, head);
 
                 memcpy(head, &cnt, sizeof(int));
 
+                LOG(INFO) << "cnt=" << cnt << " ,length=" << head - buffer;
                 asio::write(sock, asio::buffer(buffer, head - buffer + sizeof(int)));
             }
         } catch (std::exception& e) {
