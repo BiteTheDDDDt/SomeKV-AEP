@@ -45,7 +45,8 @@ public:
         for (size_t i = 0; i < _peer_host.size(); i++) {
             int remote_cnt = _remote->read_remote(_peer_host[i].first, _peer_host[i].second, buffer,
                                                   length, (char*)res);
-            LOG(INFO) << "remote_cnt=" << remote_cnt << " ,peer=" << _peer_host[i].first;
+            LOG(INFO) << "remote_cnt=" << remote_cnt << " ,peer=" << _peer_host[i].first << ":"
+                      << _peer_host[i].second;
             cnt += remote_cnt;
         }
         cnt += _local.read(select_column, where_column, column_key, column_key_len, res);

@@ -79,7 +79,7 @@ public:
                         LOG(WARNING) << "Query length more than buffer size.";
                     }
                     size_t length = sock.read_some(asio::buffer(head, remain_buffer_length), error);
-                    LOG(INFO)<<"length="<<length;
+                    LOG(INFO) << "length=" << length;
                     if (!length) {
                         break;
                     }
@@ -126,4 +126,5 @@ private:
 inline NetworkIO::NetworkIO(int port, const StorageEngine& local)
         : _port(port), _local(local), _acceptor(_io_context, tcp::endpoint(tcp::v4(), port)) {
     _receiver = std::make_unique<std::thread>(receive_loop, this);
+    LOG(INFO) << "NetworkIO init port=" << port;
 }
