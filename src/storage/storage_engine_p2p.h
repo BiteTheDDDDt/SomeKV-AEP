@@ -2,6 +2,8 @@
 
 #include <glog/logging.h>
 
+#include <mutex>
+
 #include "storage/storage_engine.h"
 #include "utils/common.h"
 #include "utils/network_io.h"
@@ -28,6 +30,7 @@ public:
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
                 size_t column_key_len, void* res) {
+        std::unique_lock<std::mutex> lck(_mtx);
         constexpr int query_length_prefix = sizeof(int32_t) * 2 + sizeof(size_t);
         char buffer[query_length_prefix + column_key_len];
 
@@ -56,4 +59,5 @@ private:
     std::string _port;
     std::vector<std::pair<std::string, std::string> > _peer_host;
     std::shared_ptr<NetworkIO> _remote;
+    std::mutex _mtx;
 };

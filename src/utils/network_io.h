@@ -79,6 +79,7 @@ public:
                         LOG(WARNING) << "Query length more than buffer size.";
                     }
                     size_t length = sock.read_some(asio::buffer(head, remain_buffer_length), error);
+                    LOG(INFO)<<"length="<<length;
                     if (!length) {
                         break;
                     }
