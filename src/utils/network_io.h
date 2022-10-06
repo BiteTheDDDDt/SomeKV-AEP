@@ -1,212 +1,120 @@
-//
-// Created by rainbowwing on 2022/9/4.
-//
-
-#ifndef SOMEKV_AEP_NETWORKIO_H
-#define SOMEKV_AEP_NETWORKIO_H
+#pragma once
 
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <memory>
 #include <thread>
 #include <utility>
 
-#include "asio/error_code.hpp"
+#include "storage/storage_engine.h"
 #include "utils/asio.hpp"
+#include "utils/common.h"
 
 using asio::ip::tcp;
 
-const int max_length = 8192;
-
-void session(tcp::socket sock, std::function<std::string(char*, int)> call_back) {
-    LOG(INFO) << "netio session success get query\n";
-    try {
-        std::string read_data;
-        // read_head
-        char data[max_length];
-        while (read_data.size() < 10) {
-            asio::error_code error;
-            size_t length = sock.read_some(asio::buffer(data), error);
-            read_data += std::string(data, length);
-            if (error == asio::error::eof)
-                return;
-            else if (error)
-                throw asio::system_error(error); // Some other error.
-        }
-        // std::cout << "x: " << read_data << std::endl;
-        int x = std::stoi(read_data.substr(2, 8));
-        // std::cout << "x: " << x << std::endl;
-        while (read_data.size() < 10 + x) {
-            char data[max_length];
-            asio::error_code error;
-            size_t length = sock.read_some(asio::buffer(data), error);
-            read_data += std::string(data, length);
-            if (error == asio::error::eof)
-                break; // Connection closed cleanly by peer.
-            else if (error)
-                throw asio::system_error(error); // Some other error.
-        }
-        read_data.erase(0, 10);
-        std::string ret_data = call_back(read_data.data(), (int)read_data.length());
-        LOG(INFO) << "data  success get \n";
-
-        //puts(read_data.data());
-
-        //        asio::write(sock, asio::buffer(read_data.substr(0,8).data(), 8));
-
-        int len_ret = ret_data.length();
-        std::string ret_string_length = std::to_string(len_ret);
-        while (ret_string_length.size() < 8) ret_string_length = "0" + ret_string_length;
-        std::string ret = "aa" + ret_string_length + ret_data;
-        // std::cout << " ret " << ret_string_length <<" "<<ret_data <<" "<< ret<<  std::endl;
-
-        //memcpy(data,ret.data(),ret.length());
-        asio::write(sock, asio::buffer(ret.data(), ret.length()));
-        LOG(INFO) << "data  success write back " << ret << std::endl;
-
-        /* for (;;)
-         {
-             char data[max_length];
-
-             asio::error_code error;
-             size_t length = sock.read_some(asio::buffer(data), error);
-             if (error == asio::error::eof)
-                 break; // Connection closed cleanly by peer.
-             else if (error)
-                 throw asio::system_error(error); // Some other error.
-             puts(data);
-             memcpy(data,"SUCCESS",sizeof("SUCCESS"));
-             asio::write(sock, asio::buffer(data, length));
-         }*/
-
-    } catch (std::exception& e) {
-        std::cerr << "Exception in thread: " << e.what() << "\n";
-    }
-}
-
-struct NetworkIO {
-    std::shared_ptr<asio::io_context> io_context;
-    std::shared_ptr<std::thread> th;
-    int is_destroy = false;
-    tcp::acceptor* acceptor;
-    //std::function<std::vector<std::string>(char *)>call_back;
-private:
-    int _port;
-
+class NetworkIO {
 public:
-    NetworkIO(int port, std::function<std::string(char*, int)> call_back) {
-        _port = port;
-        io_context = std::make_shared<asio::io_context>();
+    NetworkIO(int port, const StorageEngine& local);
 
-        is_destroy = false;
-        acceptor = new tcp::acceptor(*io_context, tcp::endpoint(tcp::v4(), port));
-        th = std::make_shared<std::thread>(
-                [&](int port, std::function<std::string(char*, int)> call_back) {
-                    for (; !is_destroy;) {
-                        LOG(INFO) << "server start  thread \n";
-                        std::thread(session, acceptor->accept(), call_back).detach();
-                    }
-                },
-                port, call_back);
-
-        LOG(INFO) << "netio success build\n";
-        //this->call_back = call_back;
-    }
-
-    std::string sent(std::string ip, std::string port, char* data, int len) {
-        LOG(INFO) << "sent query " << ip << " " << port << "\n";
-        //std::cout << "??? " <<std::endl;
+    size_t read_remote(std::string ip, std::string port, const char* query, size_t query_length,
+                       char* result) {
+        tcp::socket sock(_io_context);
         try {
-            tcp::socket s(*io_context);
-            int cnt = 0;
-            while (1) {
-                if (cnt++ > 5) return "";
-                try {
-                    //  LOG(INFO) << "connect  st "<< cnt << " "<< ip <<" "<<port <<"\n";
-                    asio::connect(s, tcp::resolver(*io_context).resolve(ip.data(), port.data()));
-                    //    LOG(INFO) << "connect  en"<< cnt << "\n";
-                } catch (std::exception& e) {
-                    //   LOG(INFO) << "err " <<e.what()<<"\n";
-                    std::this_thread::sleep_for(std::chrono::milliseconds(20));
-                    continue;
-                }
-                break;
-            }
-            if (!len) {
-                return "";
-            }
-            //  LOG(INFO) << "sent success !!!! \n";
-            //   LOG(INFO) << "where is sig err "<< 1 <<  "\n";
-            //std::cout << "Enter message: ";
-            //        char request[max_length];
-            //        std::cin.getline(request, max_length);
-            //        size_t request_length = std::strlen(request);
-            char* sent_data = new char[len + 10];
-            //  LOG(INFO) << "where is sig err "<< 2<<  "\n";
+            asio::connect(sock, tcp::resolver(_io_context).resolve(ip.data(), port.data()));
 
-            std::string sss = std::to_string(len);
-            // LOG(INFO) << "where is sig err "<< 3 <<  "\n";
-            while (sss.length() < 8) {
-                sss = "0" + sss;
+            if (!query_length) {
+                return 0;
             }
-            sss = "aa" + sss;
-            //  LOG(INFO) << "where is sig err "<< 4 <<  "\n";
-            memcpy(sent_data, sss.data(), 10);
-            //  LOG(INFO) << "where is sig err "<< 5 <<  "\n";
-            memcpy(sent_data + 10, data, len);
-            //  LOG(INFO) << "where is sig err "<< 6<<  "\n";
-            asio::write(s, asio::buffer(sent_data, len + 10));
-            //   LOG(INFO) << "where is sig err "<<7<<  "\n";
-            delete[] sent_data;
-            //   LOG(INFO) << "where is sig err "<< 8 <<  "\n";
-            //std::cout << "sent ok " << std::endl;
-            char reply[max_length];
-            //  LOG(INFO) << "where is sig err "<< 9 <<  "\n";
-            std::string get_ret;
-            // LOG(INFO) << "where is sig err "<< 10 <<  "\n";
-            // LOG(INFO) << "where is sig err "<< 10.1 <<": " << get_ret<<"\n";
-            while (get_ret.size() < 10) {
-                //    LOG(INFO) << "where is sig err "<< 10.2 <<": " << "<10"<<"\n";
-                size_t reply_length = asio::read(s, asio::buffer(reply, 10));
-                //    LOG(INFO) << "where is sig err "<< 10.3 <<": " << reply_length <<"???" <<std::string(reply, reply_length) <<"\n";
-                get_ret += std::string(reply, reply_length);
-            }
-            //   LOG(INFO) << "where is sig err "<< 11 <<  "\n";
-            int x = std::stoi(get_ret.substr(2, 8));
-            //   LOG(INFO) << "where is sig err "<< 12 <<  "\n";
-            while (get_ret.size() < 10 + x) {
-                size_t reply_length = asio::read(s, asio::buffer(reply, x));
-                get_ret += std::string(reply, reply_length);
-            }
-            //  LOG(INFO) << "where is sig err "<< 13 <<  "\n";
-            get_ret.erase(0, 10);
-            // LOG(INFO) << "get sent back success !!!! \n";
-            return get_ret;
+
+            asio::write(sock, asio::buffer(query, query_length));
+
+            size_t length = asio::read(sock, asio::buffer(result, MAX_QUERY_BUFFER_LENGTH));
+            result += length - sizeof(int);
+
+            return *(int*)result;
         } catch (std::exception& e) {
-            LOG(INFO) << " sent some err !!!! " << e.what() << "\n";
-            return "";
+            LOG(WARNING) << e.what();
+            return 0;
         }
     }
     ~NetworkIO() {
-        std::cout << "??" << std::endl;
-        LOG(INFO) << "start destroy\n";
-        is_destroy = true;
-        sent("127.0.0.1", std::to_string(_port), nullptr, 0);
+        _is_destroy = true;
+
+        read_remote("127.0.0.1", std::to_string(_port), nullptr, 0,
+                    nullptr); // Send to local a query to avoid blocking.
         try {
-            asio::error_code err;
-            acceptor->cancel(err);
-            LOG(INFO) << err;
-            acceptor->close(err);
-            LOG(INFO) << err;
-            io_context->stop();
+            _acceptor.cancel();
+            _acceptor.close();
+            _io_context.stop();
         } catch (std::exception& e) {
-            LOG(INFO) << e.what();
+            LOG(WARNING) << e.what();
         }
 
-        //  delete acceptor;
-        th->join();
-        LOG(INFO) << "end destroy\n";
+        _receiver->join();
     }
+
+    static void receive_loop(NetworkIO* io) { io->loop(); }
+
+    static void receive_query(NetworkIO* io, tcp::socket&& sock) { io->receive(std::move(sock)); }
+
+    void loop() {
+        while (!_is_destroy) {
+            std::thread(receive_query, this, _acceptor.accept()).detach();
+        }
+    }
+
+    void receive(tcp::socket sock) {
+        try {
+            char buffer[MAX_QUERY_BUFFER_LENGTH];
+
+            // receive query binary
+            {
+                asio::error_code error;
+                char* head = buffer;
+                size_t remain_buffer_length = MAX_QUERY_BUFFER_LENGTH;
+                while (error != asio::error::eof) {
+                    if (remain_buffer_length <= 0) {
+                        LOG(WARNING) << "Query length more than buffer size.";
+                    }
+                    size_t length = sock.read_some(asio::buffer(head, remain_buffer_length), error);
+                    head += length;
+                    remain_buffer_length -= length;
+                }
+            }
+
+            // Decode query and read from local, then write result back as [binary_result(x byte) + result_cnt(4 byte)]
+            {
+                char* head = buffer;
+                int32_t select_column;
+                int32_t where_column;
+                const void* column_key;
+                size_t column_key_len;
+
+                decode_query(select_column, where_column, column_key, column_key_len, buffer);
+
+                int cnt =
+                        _local.read(select_column, where_column, column_key, column_key_len, head);
+
+                memcpy(head, &cnt, sizeof(int));
+
+                asio::write(sock, asio::buffer(buffer, head - buffer + sizeof(int)));
+            }
+        } catch (std::exception& e) {
+            LOG(WARNING) << e.what();
+        }
+    }
+
+private:
+    bool _is_destroy = false;
+    int _port;
+    const StorageEngine& _local;
+    asio::io_context _io_context;
+    tcp::acceptor _acceptor;
+    std::unique_ptr<std::thread> _receiver;
 };
 
-#endif //SOMEKV_AEP_NETWORKIO_H
+inline NetworkIO::NetworkIO(int port, const StorageEngine& local)
+        : _port(port), _local(local), _acceptor(_io_context, tcp::endpoint(tcp::v4(), port)) {
+    _receiver = std::make_unique<std::thread>(receive_loop, this);
+}

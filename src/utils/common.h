@@ -23,6 +23,8 @@ constexpr size_t MAX_ROW_SIZE = 500;
 constexpr size_t MAX_ROW_SIZE = 50000000;
 #endif
 
+constexpr int MAX_QUERY_BUFFER_LENGTH = 4096;
+
 inline uint64_t get_file_size(std::string path) {
     struct ::stat file_stat;
     if (stat(path.data(), &file_stat) != 0) {
@@ -87,4 +89,39 @@ inline void print_meminfo() {
     }
     LOG(INFO) << "\n" << result;
     pclose(output);
+}
+
+inline size_t encode_query(int32_t select_column, int32_t where_column, const void* column_key,
+                           size_t column_key_len, char* buffer) {
+    int offset = 0;
+
+    memcpy(buffer + offset, &select_column, sizeof(int32_t));
+    offset += sizeof(int32_t);
+
+    memcpy(buffer + offset, &where_column, sizeof(int32_t));
+    offset += sizeof(int32_t);
+
+    memcpy(buffer + offset, &column_key_len, sizeof(size_t));
+    offset += sizeof(size_t);
+
+    memcpy(buffer + offset, column_key, column_key_len);
+    offset += column_key_len;
+
+    return offset;
+}
+
+inline void decode_query(int32_t& select_column, int32_t& where_column, const void*& column_key,
+                         size_t& column_key_len, const char* buffer) {
+    int offset = 0;
+
+    memcpy(&select_column, buffer + offset, sizeof(int32_t));
+    offset += sizeof(int32_t);
+
+    memcpy(&where_column, buffer + offset, sizeof(int32_t));
+    offset += sizeof(int32_t);
+
+    memcpy(&column_key_len, buffer + offset, sizeof(size_t));
+    offset += sizeof(size_t);
+
+    memcpy((char*)column_key, buffer + offset, column_key_len);
 }
