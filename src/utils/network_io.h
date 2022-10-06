@@ -20,6 +20,7 @@ public:
     size_t read_remote(std::string ip, std::string port, const char* query, size_t query_length,
                        char* result) {
         tcp::socket sock(_io_context);
+        size_t length = 0;
         try {
             asio::connect(sock, tcp::resolver(_io_context).resolve(ip.data(), port.data()));
 
@@ -29,14 +30,12 @@ public:
 
             asio::write(sock, asio::buffer(query, query_length));
 
-            size_t length = asio::read(sock, asio::buffer(result, MAX_QUERY_BUFFER_LENGTH));
-            result += length - sizeof(int);
-
-            return *(int*)result;
+            length = asio::read(sock, asio::buffer(result, MAX_QUERY_BUFFER_LENGTH));
         } catch (std::exception& e) {
-            LOG(WARNING) << e.what();
-            return 0;
+            LOG(WARNING) << e.what() << " length=" << length;
         }
+        result += length - sizeof(int);
+        return *(int*)result;
     }
     ~NetworkIO() {
         _is_destroy = true;
