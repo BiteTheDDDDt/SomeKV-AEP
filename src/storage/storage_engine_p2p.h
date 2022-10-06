@@ -19,10 +19,10 @@ public:
         _port = host.substr(x + 1, host.length() - x - 1);
         _remote = std::make_shared<NetworkIO>(stoi(_port), _local);
 
-        LOG(INFO) << "init StorageEngineP2P: " << host << " ,peer_size=" << _peer_host.size();
+        LOG(INFO) << "Init StorageEngineP2P: " << host << " ,peer_size=" << _peer_host.size();
     }
 
-    ~StorageEngineP2P() = default;
+    ~StorageEngineP2P() { LOG(INFO) << "Destroy StorageEngineP2P"; }
 
     void write(const void* data) { _local.write(data); }
 
