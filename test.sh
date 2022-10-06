@@ -12,4 +12,4 @@ cd test
 mkdir storage
 mkdir storage/aep
 mkdir storage/disk
-#./SomeKV-AEP
+./SomeKV-AEP

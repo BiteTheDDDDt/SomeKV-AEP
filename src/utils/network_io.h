@@ -5,14 +5,12 @@
 #ifndef SOMEKV_AEP_NETWORKIO_H
 #define SOMEKV_AEP_NETWORKIO_H
 
-#include <iostream>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <cstdlib>
-#include <iostream>
 #include <thread>
 #include <utility>
+
 #include "asio/error_code.hpp"
 #include "utils/asio.hpp"
 
@@ -20,14 +18,13 @@ using asio::ip::tcp;
 
 const int max_length = 8192;
 
-void session(tcp::socket sock, std::function<std::string(char *, int)> call_back) {
+void session(tcp::socket sock, std::function<std::string(char*, int)> call_back) {
     LOG(INFO) << "netio session success get query\n";
     try {
         std::string read_data;
         // read_head
         char data[max_length];
         while (read_data.size() < 10) {
-
             asio::error_code error;
             size_t length = sock.read_some(asio::buffer(data), error);
             read_data += std::string(data, length);
@@ -50,19 +47,16 @@ void session(tcp::socket sock, std::function<std::string(char *, int)> call_back
                 throw asio::system_error(error); // Some other error.
         }
         read_data.erase(0, 10);
-        std::string ret_data = call_back(read_data.data(), (int) read_data.length());
+        std::string ret_data = call_back(read_data.data(), (int)read_data.length());
         LOG(INFO) << "data  success get \n";
 
         //puts(read_data.data());
 
-//        asio::write(sock, asio::buffer(read_data.substr(0,8).data(), 8));
-
-
+        //        asio::write(sock, asio::buffer(read_data.substr(0,8).data(), 8));
 
         int len_ret = ret_data.length();
         std::string ret_string_length = std::to_string(len_ret);
-        while (ret_string_length.size() < 8)
-            ret_string_length = "0" + ret_string_length;
+        while (ret_string_length.size() < 8) ret_string_length = "0" + ret_string_length;
         std::string ret = "aa" + ret_string_length + ret_data;
         // std::cout << " ret " << ret_string_length <<" "<<ret_data <<" "<< ret<<  std::endl;
 
@@ -85,42 +79,42 @@ void session(tcp::socket sock, std::function<std::string(char *, int)> call_back
              asio::write(sock, asio::buffer(data, length));
          }*/
 
-    }
-    catch (std::exception &e) {
+    } catch (std::exception& e) {
         std::cerr << "Exception in thread: " << e.what() << "\n";
     }
 }
-
 
 struct NetworkIO {
     std::shared_ptr<asio::io_context> io_context;
     std::shared_ptr<std::thread> th;
     int is_destroy = false;
-    tcp::acceptor * acceptor;
+    tcp::acceptor* acceptor;
     //std::function<std::vector<std::string>(char *)>call_back;
 private:
     int _port;
+
 public:
-    NetworkIO(int port, std::function<std::string(char *, int)> call_back) {
-        _port=port;
+    NetworkIO(int port, std::function<std::string(char*, int)> call_back) {
+        _port = port;
         io_context = std::make_shared<asio::io_context>();
 
         is_destroy = false;
-        acceptor = new tcp::acceptor (*io_context, tcp::endpoint(tcp::v4(), port));
-        th = std::make_shared<std::thread>([&](int port, std::function<std::string(char *, int)> call_back) {
-
-            for (;!is_destroy;) {
-                LOG(INFO) << "server start  thread \n";
-                std::thread(session, acceptor->accept(), call_back).detach();
-            }
-        },port,call_back);
+        acceptor = new tcp::acceptor(*io_context, tcp::endpoint(tcp::v4(), port));
+        th = std::make_shared<std::thread>(
+                [&](int port, std::function<std::string(char*, int)> call_back) {
+                    for (; !is_destroy;) {
+                        LOG(INFO) << "server start  thread \n";
+                        std::thread(session, acceptor->accept(), call_back).detach();
+                    }
+                },
+                port, call_back);
 
         LOG(INFO) << "netio success build\n";
         //this->call_back = call_back;
     }
 
-    std::string sent(std::string ip, std::string port, char *data, int len) {
-        LOG(INFO) << "sent query "<<ip<<" "<< port <<"\n";
+    std::string sent(std::string ip, std::string port, char* data, int len) {
+        LOG(INFO) << "sent query " << ip << " " << port << "\n";
         //std::cout << "??? " <<std::endl;
         try {
             tcp::socket s(*io_context);
@@ -128,96 +122,91 @@ public:
             while (1) {
                 if (cnt++ > 5) return "";
                 try {
-                  //  LOG(INFO) << "connect  st "<< cnt << " "<< ip <<" "<<port <<"\n";
+                    //  LOG(INFO) << "connect  st "<< cnt << " "<< ip <<" "<<port <<"\n";
                     asio::connect(s, tcp::resolver(*io_context).resolve(ip.data(), port.data()));
-                //    LOG(INFO) << "connect  en"<< cnt << "\n";
-                }
-                catch (std::exception &e) {
-                 //   LOG(INFO) << "err " <<e.what()<<"\n";
+                    //    LOG(INFO) << "connect  en"<< cnt << "\n";
+                } catch (std::exception& e) {
+                    //   LOG(INFO) << "err " <<e.what()<<"\n";
                     std::this_thread::sleep_for(std::chrono::milliseconds(20));
                     continue;
                 }
                 break;
             }
-        if(!len){
-            return "";
-        }
-          //  LOG(INFO) << "sent success !!!! \n";
-            int seg_cnt = 0;
-         //   LOG(INFO) << "where is sig err "<< 1 <<  "\n";
-                      //std::cout << "Enter message: ";
+            if (!len) {
+                return "";
+            }
+            //  LOG(INFO) << "sent success !!!! \n";
+            //   LOG(INFO) << "where is sig err "<< 1 <<  "\n";
+            //std::cout << "Enter message: ";
             //        char request[max_length];
             //        std::cin.getline(request, max_length);
             //        size_t request_length = std::strlen(request);
-            char *sent_data = new char[len + 10];
-          //  LOG(INFO) << "where is sig err "<< 2<<  "\n";
+            char* sent_data = new char[len + 10];
+            //  LOG(INFO) << "where is sig err "<< 2<<  "\n";
 
             std::string sss = std::to_string(len);
-           // LOG(INFO) << "where is sig err "<< 3 <<  "\n";
+            // LOG(INFO) << "where is sig err "<< 3 <<  "\n";
             while (sss.length() < 8) {
                 sss = "0" + sss;
             }
             sss = "aa" + sss;
-          //  LOG(INFO) << "where is sig err "<< 4 <<  "\n";
+            //  LOG(INFO) << "where is sig err "<< 4 <<  "\n";
             memcpy(sent_data, sss.data(), 10);
-          //  LOG(INFO) << "where is sig err "<< 5 <<  "\n";
+            //  LOG(INFO) << "where is sig err "<< 5 <<  "\n";
             memcpy(sent_data + 10, data, len);
-          //  LOG(INFO) << "where is sig err "<< 6<<  "\n";
+            //  LOG(INFO) << "where is sig err "<< 6<<  "\n";
             asio::write(s, asio::buffer(sent_data, len + 10));
-         //   LOG(INFO) << "where is sig err "<<7<<  "\n";
+            //   LOG(INFO) << "where is sig err "<<7<<  "\n";
             delete[] sent_data;
-         //   LOG(INFO) << "where is sig err "<< 8 <<  "\n";
+            //   LOG(INFO) << "where is sig err "<< 8 <<  "\n";
             //std::cout << "sent ok " << std::endl;
             char reply[max_length];
-          //  LOG(INFO) << "where is sig err "<< 9 <<  "\n";
+            //  LOG(INFO) << "where is sig err "<< 9 <<  "\n";
             std::string get_ret;
-           // LOG(INFO) << "where is sig err "<< 10 <<  "\n";
-           // LOG(INFO) << "where is sig err "<< 10.1 <<": " << get_ret<<"\n";
+            // LOG(INFO) << "where is sig err "<< 10 <<  "\n";
+            // LOG(INFO) << "where is sig err "<< 10.1 <<": " << get_ret<<"\n";
             while (get_ret.size() < 10) {
-            //    LOG(INFO) << "where is sig err "<< 10.2 <<": " << "<10"<<"\n";
-                size_t reply_length = asio::read(s,
-                                                 asio::buffer(reply, 10));
-            //    LOG(INFO) << "where is sig err "<< 10.3 <<": " << reply_length <<"???" <<std::string(reply, reply_length) <<"\n";
+                //    LOG(INFO) << "where is sig err "<< 10.2 <<": " << "<10"<<"\n";
+                size_t reply_length = asio::read(s, asio::buffer(reply, 10));
+                //    LOG(INFO) << "where is sig err "<< 10.3 <<": " << reply_length <<"???" <<std::string(reply, reply_length) <<"\n";
                 get_ret += std::string(reply, reply_length);
             }
-         //   LOG(INFO) << "where is sig err "<< 11 <<  "\n";
+            //   LOG(INFO) << "where is sig err "<< 11 <<  "\n";
             int x = std::stoi(get_ret.substr(2, 8));
-         //   LOG(INFO) << "where is sig err "<< 12 <<  "\n";
+            //   LOG(INFO) << "where is sig err "<< 12 <<  "\n";
             while (get_ret.size() < 10 + x) {
-
                 size_t reply_length = asio::read(s, asio::buffer(reply, x));
                 get_ret += std::string(reply, reply_length);
             }
-          //  LOG(INFO) << "where is sig err "<< 13 <<  "\n";
+            //  LOG(INFO) << "where is sig err "<< 13 <<  "\n";
             get_ret.erase(0, 10);
-           // LOG(INFO) << "get sent back success !!!! \n";
+            // LOG(INFO) << "get sent back success !!!! \n";
             return get_ret;
-        } catch (std::exception &e) {
-            LOG(INFO) << " sent some err !!!! " << e.what() <<"\n";
+        } catch (std::exception& e) {
+            LOG(INFO) << " sent some err !!!! " << e.what() << "\n";
             return "";
         }
     }
-    ~NetworkIO(){
-        std::cout <<"??"<< std::endl;
+    ~NetworkIO() {
+        std::cout << "??" << std::endl;
         LOG(INFO) << "start destroy\n";
         is_destroy = true;
-        sent("127.0.0.1",std::to_string(_port),nullptr,0);
+        sent("127.0.0.1", std::to_string(_port), nullptr, 0);
         try {
             asio::error_code err;
             acceptor->cancel(err);
-            LOG(INFO)<<err;
+            LOG(INFO) << err;
             acceptor->close(err);
-            LOG(INFO)<<err;
+            LOG(INFO) << err;
             io_context->stop();
-        }catch (std::exception &e){
+        } catch (std::exception& e) {
             LOG(INFO) << e.what();
         }
 
-      //  delete acceptor;
+        //  delete acceptor;
         th->join();
         LOG(INFO) << "end destroy\n";
     }
 };
-
 
 #endif //SOMEKV_AEP_NETWORKIO_H
