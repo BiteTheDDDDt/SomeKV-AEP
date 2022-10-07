@@ -7,6 +7,7 @@
 #include "storage/storage_engine.h"
 #include "utils/common.h"
 #include "utils/network_io.h"
+#include "utils/schema.h"
 
 class StorageEngineP2P {
 public:
@@ -29,7 +30,7 @@ public:
     void write(const void* data) { _local.write(data); }
 
     size_t read(int32_t select_column, int32_t where_column, const void* column_key,
-                size_t column_key_len, void* res) {
+                size_t column_key_len, char* res) {
         std::unique_lock<std::mutex> lck(_mtx);
         constexpr int query_length_prefix = sizeof(int32_t) * 2 + sizeof(size_t);
         char buffer[query_length_prefix + column_key_len];
@@ -44,10 +45,11 @@ public:
 
         for (size_t i = 0; i < _peer_host.size(); i++) {
             int remote_cnt = _remote->read_remote(_peer_host[i].first, _peer_host[i].second, buffer,
-                                                  length, (char*)res);
+                                                  length, res);
             LOG(INFO) << "remote_cnt=" << remote_cnt << " ,peer=" << _peer_host[i].first << ":"
                       << _peer_host[i].second;
             cnt += remote_cnt;
+            res += remote_cnt * Schema::COLUMN_LENGTH[select_column];
         }
         cnt += _local.read(select_column, where_column, column_key, column_key_len, res);
 

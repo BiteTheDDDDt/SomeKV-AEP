@@ -31,7 +31,7 @@ public:
                     asio::connect(sock, resolver.resolve(ip.data(), port.data()));
                 } catch (std::exception& e) {
                     LOG(WARNING) << e.what();
-                    if (!retry) {
+                    if (retry == 1) {
                         LOG(INFO) << "Connect fail.";
                         return 0;
                     }
@@ -98,11 +98,12 @@ public:
 
                 size_t length = sock.read_some(asio::buffer(head, MAX_QUERY_BUFFER_LENGTH), error);
                 LOG(INFO) << "length=" << length;
+                if (error) {
+                    LOG(INFO) << error;
+                }
                 if (!length) {
                     return;
                 }
-
-                head += length;
             }
 
             // Decode query and read from local, then write result back as [binary_result(x byte) + result_cnt(4 byte)]
@@ -122,8 +123,9 @@ public:
 
                 memcpy(head, &cnt, sizeof(int));
 
-                LOG(INFO) << "cnt=" << cnt << " ,length=" << head - buffer;
-                asio::write(sock, asio::buffer(buffer, head - buffer + sizeof(int)));
+                LOG(INFO) << "return_cnt=" << cnt;
+                asio::write(sock, asio::buffer(buffer, Schema::COLUMN_LENGTH[select_column] * cnt +
+                                                               sizeof(int)));
             }
         } catch (std::exception& e) {
             LOG(WARNING) << e.what();
