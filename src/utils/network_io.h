@@ -43,7 +43,7 @@ public:
 
             asio::write(sock, asio::buffer(query, query_length));
 
-            length = sock.read_some(asio::buffer(result, MAX_QUERY_BUFFER_LENGTH));
+            length = asio::read(sock, asio::buffer(result, MAX_QUERY_BUFFER_LENGTH));
         } catch (std::exception& e) {
             LOG(WARNING) << e.what() << " length=" << length;
         }
