@@ -19,10 +19,11 @@ public:
 
     size_t read_remote(std::string ip, std::string port, const char* query, size_t query_length,
                        char* result) {
-        tcp::socket sock(_io_context);
+        asio::io_context io_context;
+        tcp::socket sock(io_context);
         size_t length = 0;
         try {
-            asio::connect(sock, tcp::resolver(_io_context).resolve(ip.data(), port.data()));
+            asio::connect(sock, tcp::resolver(io_context).resolve(ip.data(), port.data()));
 
             if (!query_length) {
                 return 0;
