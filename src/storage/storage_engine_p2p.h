@@ -52,7 +52,7 @@ public:
             res += remote_cnt * Schema::COLUMN_LENGTH[select_column];
         }
         cnt += _local.read(select_column, where_column, column_key, column_key_len, res);
-
+        LOG(INFO) << "sum_cnt=" << cnt;
         return cnt;
     }
 
