@@ -34,6 +34,11 @@ public:
         } catch (std::exception& e) {
             LOG(WARNING) << e.what() << " length=" << length;
         }
+
+        if (length == 0) {
+            return 0;
+        }
+
         result += length - sizeof(int);
         return *(int*)result;
     }
@@ -123,7 +128,9 @@ private:
 };
 
 inline NetworkIO::NetworkIO(int port, const StorageEngine& local)
-        : _port(port), _local(local), _acceptor(_io_context, tcp::endpoint(tcp::v4(), port)) {
+        : _port(port),
+          _local(local),
+          _acceptor(_io_context, {{}, static_cast<asio::ip::port_type>(port)}) {
     _receiver = std::make_unique<std::thread>(receive_loop, this);
     LOG(INFO) << "NetworkIO init port=" << port;
 }
