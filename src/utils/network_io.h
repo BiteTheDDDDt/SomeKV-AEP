@@ -31,6 +31,10 @@ public:
                     asio::connect(sock, resolver.resolve(ip.data(), port.data()));
                 } catch (std::exception& e) {
                     LOG(WARNING) << e.what();
+                    if (!retry) {
+                        LOG(INFO) << "Connect fail.";
+                        return 0;
+                    }
                     continue;
                 }
                 LOG(INFO) << "Connect sucess.";
