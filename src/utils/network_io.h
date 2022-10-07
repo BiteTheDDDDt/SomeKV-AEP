@@ -124,12 +124,13 @@ private:
     bool _is_destroy = false;
     int _port;
     const StorageEngine& _local;
+    asio::io_context _io_context;
     tcp::acceptor _acceptor;
     std::unique_ptr<std::thread> _receiver;
 };
 
 inline NetworkIO::NetworkIO(int port, const StorageEngine& local)
-        : _port(port), _local(local), _acceptor({}, tcp::endpoint(tcp::v4(), port)) {
+        : _port(port), _local(local), _acceptor(_io_context, tcp::endpoint(tcp::v4(), port)) {
     _receiver = std::make_unique<std::thread>(receive_loop, this);
     LOG(INFO) << "NetworkIO init port=" << port;
 }
