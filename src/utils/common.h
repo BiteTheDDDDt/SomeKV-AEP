@@ -130,5 +130,5 @@ inline void decode_query(int32_t& select_column, int32_t& where_column, char* co
     memcpy(&column_key_len, buffer + offset, sizeof(size_t));
     offset += sizeof(size_t);
 
-    memcpy((char*)column_key, buffer + offset, column_key_len);
+    memcpy(column_key, buffer + offset, column_key_len);
 }

@@ -25,7 +25,16 @@ public:
 
         size_t length = 0;
         try {
-            asio::connect(sock, resolver.resolve(ip.data(), port.data()));
+            while (true) {
+                try {
+                    asio::connect(sock, resolver.resolve(ip.data(), port.data()));
+                } catch (std::exception& e) {
+                    LOG(WARNING) << e.what();
+                    continue;
+                }
+                LOG(INFO) << "Connect sucess.";
+                break;
+            }
 
             if (!query_length) {
                 return 0;
