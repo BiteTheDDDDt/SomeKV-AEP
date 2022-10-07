@@ -25,7 +25,8 @@ public:
 
         size_t length = 0;
         try {
-            while (true) {
+            int retry = 5;
+            while (--retry) {
                 try {
                     asio::connect(sock, resolver.resolve(ip.data(), port.data()));
                 } catch (std::exception& e) {
@@ -77,6 +78,7 @@ public:
         while (!_is_destroy) {
             LOG(INFO) << "Waiting for accept.";
             std::thread(receive_query, this, _acceptor.accept()).detach();
+            LOG(INFO) << "Complete a receive.";
         }
     }
 
@@ -89,20 +91,14 @@ public:
             {
                 asio::error_code error;
                 char* head = buffer;
-                size_t remain_buffer_length = MAX_QUERY_BUFFER_LENGTH;
-                while (error != asio::error::eof) {
-                    if (remain_buffer_length <= 0) {
-                        LOG(WARNING) << "Query length more than buffer size.";
-                    }
-                    size_t length = sock.read_some(asio::buffer(head, remain_buffer_length), error);
-                    LOG(INFO) << "length=" << length;
-                    if (!length) {
-                        break;
-                    }
 
-                    head += length;
-                    remain_buffer_length -= length;
+                size_t length = sock.read_some(asio::buffer(head, MAX_QUERY_BUFFER_LENGTH), error);
+                LOG(INFO) << "length=" << length;
+                if (!length) {
+                    return;
                 }
+
+                head += length;
             }
 
             // Decode query and read from local, then write result back as [binary_result(x byte) + result_cnt(4 byte)]
