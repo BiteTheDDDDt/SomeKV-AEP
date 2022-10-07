@@ -20,10 +20,12 @@ public:
     size_t read_remote(std::string ip, std::string port, const char* query, size_t query_length,
                        char* result) {
         asio::io_context io_context;
+        tcp::resolver resolver(io_context);
         tcp::socket sock(io_context);
+
         size_t length = 0;
         try {
-            asio::connect(sock, tcp::resolver(io_context).resolve(ip.data(), port.data()));
+            asio::connect(sock, resolver.resolve(ip.data(), port.data()));
 
             if (!query_length) {
                 return 0;
@@ -51,7 +53,6 @@ public:
         try {
             _acceptor.cancel();
             _acceptor.close();
-            _io_context.stop();
         } catch (std::exception& e) {
             LOG(WARNING) << e.what();
         }
@@ -65,7 +66,7 @@ public:
 
     void loop() {
         while (!_is_destroy) {
-            std::thread(receive_query, this, _acceptor.accept());
+            std::thread(receive_query, this, _acceptor.accept()).detach();
         }
     }
 
@@ -123,15 +124,12 @@ private:
     bool _is_destroy = false;
     int _port;
     const StorageEngine& _local;
-    asio::io_context _io_context;
     tcp::acceptor _acceptor;
     std::unique_ptr<std::thread> _receiver;
 };
 
 inline NetworkIO::NetworkIO(int port, const StorageEngine& local)
-        : _port(port),
-          _local(local),
-          _acceptor(_io_context, {{}, static_cast<asio::ip::port_type>(port)}) {
+        : _port(port), _local(local), _acceptor({}, tcp::endpoint(tcp::v4(), port)) {
     _receiver = std::make_unique<std::thread>(receive_loop, this);
     LOG(INFO) << "NetworkIO init port=" << port;
 }
