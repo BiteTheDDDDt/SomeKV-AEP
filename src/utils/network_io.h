@@ -100,7 +100,7 @@ public:
                 char* head = buffer;
                 int32_t select_column;
                 int32_t where_column;
-                const void* column_key;
+                char column_key[128];
                 size_t column_key_len;
 
                 decode_query(select_column, where_column, column_key, column_key_len, buffer);

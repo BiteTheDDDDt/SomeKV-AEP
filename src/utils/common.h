@@ -117,7 +117,7 @@ inline size_t encode_query(int32_t select_column, int32_t where_column, const vo
     return offset;
 }
 
-inline void decode_query(int32_t& select_column, int32_t& where_column, const void*& column_key,
+inline void decode_query(int32_t& select_column, int32_t& where_column, char* column_key,
                          size_t& column_key_len, const char* buffer) {
     int offset = 0;
 
