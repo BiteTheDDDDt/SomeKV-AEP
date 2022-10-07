@@ -66,6 +66,7 @@ public:
 
     void loop() {
         while (!_is_destroy) {
+            LOG(INFO) << "Waiting for accept.";
             std::thread(receive_query, this, _acceptor.accept()).detach();
         }
     }
