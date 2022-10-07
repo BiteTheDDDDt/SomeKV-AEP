@@ -65,7 +65,7 @@ public:
 
     void loop() {
         while (!_is_destroy) {
-            std::thread(receive_query, this, _acceptor.accept()).detach();
+            std::thread(receive_query, this, _acceptor.accept());
         }
     }
 
