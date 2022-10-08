@@ -34,13 +34,6 @@ public:
             }
             LOG(INFO) << "Connect sucess.";
 
-            if (!query_length) {
-                return 0;
-            }
-            if (query_length == 1) {
-                return -1;
-            }
-
             sock.write_some(asio::buffer(query, query_length));
 
             length = sock.read_some(asio::buffer(result, MAX_QUERY_BUFFER_LENGTH));
@@ -50,6 +43,9 @@ public:
 
         if (length == 0) {
             return 0;
+        }
+        if (length == 1) {
+            return -1;
         }
 
         result += length - sizeof(int);
