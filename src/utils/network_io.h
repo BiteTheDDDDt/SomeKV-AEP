@@ -125,7 +125,7 @@ public:
     void close() { _is_close = true; }
 
 private:
-    bool _is_close = false; // return 1 byte to empty request
+    bool _is_close = false;
     bool _is_destroy = false;
     int _port;
     const StorageEngine& _local;
