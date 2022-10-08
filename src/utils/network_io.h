@@ -91,9 +91,7 @@ public:
                     LOG(INFO) << error;
                 }
                 if (!length) {
-                    if (_is_close) {
-                        sock.write_some(asio::buffer(buffer, 1));
-                    }
+                    sock.write_some(asio::buffer(buffer, _is_close));
                     return;
                 }
             }
