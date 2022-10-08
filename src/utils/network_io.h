@@ -93,8 +93,7 @@ public:
             {
                 asio::error_code error;
                 char* head = buffer;
-                size_t length =
-                        asio::read(sock, asio::buffer(head, MAX_QUERY_BUFFER_LENGTH), error);
+                size_t length = sock.read_some(asio::buffer(head, MAX_QUERY_BUFFER_LENGTH), error);
                 LOG(INFO) << "length=" << length;
                 if (error) {
                     LOG(INFO) << error;
@@ -122,8 +121,8 @@ public:
                 memcpy(head, &cnt, sizeof(int));
 
                 LOG(INFO) << "return_cnt=" << cnt;
-                asio::write(sock, asio::buffer(buffer, Schema::COLUMN_LENGTH[select_column] * cnt +
-                                                               sizeof(int)));
+                sock.write_some(asio::buffer(
+                        buffer, Schema::COLUMN_LENGTH[select_column] * cnt + sizeof(int)));
             }
         } catch (std::exception& e) {
             LOG(WARNING) << e.what();
