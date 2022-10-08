@@ -83,7 +83,9 @@ public:
     }
 
     void receive(tcp::socket sock) {
-        LOG(INFO) << "receive query";
+        LOG(INFO) << "receive query from " << sock.remote_endpoint().address() << ":"
+                  << sock.remote_endpoint().port() << " to " << sock.local_endpoint().address()
+                  << ":" << sock.local_endpoint().port();
         try {
             char buffer[MAX_QUERY_BUFFER_LENGTH];
 
@@ -91,8 +93,8 @@ public:
             {
                 asio::error_code error;
                 char* head = buffer;
-
-                size_t length = sock.read_some(asio::buffer(head, MAX_QUERY_BUFFER_LENGTH), error);
+                size_t length =
+                        asio::read(sock, asio::buffer(head, MAX_QUERY_BUFFER_LENGTH), error);
                 LOG(INFO) << "length=" << length;
                 if (error) {
                     LOG(INFO) << error;
