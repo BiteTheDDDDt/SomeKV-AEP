@@ -64,12 +64,6 @@ public:
 
         read_remote("127.0.0.1", std::to_string(_port), nullptr, 0,
                     nullptr); // Send to local a query to avoid blocking.
-        try {
-            _acceptor.cancel();
-            _acceptor.close();
-        } catch (std::exception& e) {
-            LOG(WARNING) << e.what();
-        }
 
         _receiver->join();
     }
@@ -80,8 +74,10 @@ public:
 
     void loop() {
         while (!_is_destroy) {
+            asio::io_context io_context;
+            tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), _port));
             LOG(INFO) << "Waiting for accept.";
-            std::thread(receive_query, this, _acceptor.accept()).detach();
+            std::thread(receive_query, this, acceptor.accept()).detach();
             LOG(INFO) << "Complete a receive.";
         }
     }
@@ -136,13 +132,11 @@ private:
     bool _is_destroy = false;
     int _port;
     const StorageEngine& _local;
-    asio::io_context _io_context;
-    tcp::acceptor _acceptor;
+
     std::unique_ptr<std::thread> _receiver;
 };
 
-inline NetworkIO::NetworkIO(int port, const StorageEngine& local)
-        : _port(port), _local(local), _acceptor(_io_context, tcp::endpoint(tcp::v4(), port)) {
+inline NetworkIO::NetworkIO(int port, const StorageEngine& local) : _port(port), _local(local) {
     _receiver = std::make_unique<std::thread>(receive_loop, this);
     LOG(INFO) << "NetworkIO init port=" << port;
 }
