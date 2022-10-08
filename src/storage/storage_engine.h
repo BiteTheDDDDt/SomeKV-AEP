@@ -49,6 +49,8 @@ public:
                               static_cast<char*>(res));
     }
 
+    bool is_empty() const { return _memtable.is_empty(); }
+
 private:
     std::string _storage_path;
     MemoryStorage _memtable;

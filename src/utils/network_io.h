@@ -25,7 +25,7 @@ public:
 
         size_t length = 0;
         try {
-            int retry = 5;
+            int retry = 2;
             while (--retry) {
                 try {
                     asio::connect(sock, resolver.resolve(ip.data(), port.data()));
@@ -33,7 +33,7 @@ public:
                     LOG(WARNING) << e.what();
                     if (retry == 1) {
                         LOG(INFO) << "Connect fail.";
-                        return 0;
+                        return -1;
                     }
                     continue;
                 }
@@ -43,6 +43,9 @@ public:
 
             if (!query_length) {
                 return 0;
+            }
+            if (query_length == 1) {
+                return -1;
             }
 
             sock.write_some(asio::buffer(query, query_length));
@@ -99,6 +102,9 @@ public:
                     LOG(INFO) << error;
                 }
                 if (!length) {
+                    if (_is_close) {
+                        sock.write_some(asio::buffer(buffer, 1));
+                    }
                     return;
                 }
             }
@@ -129,7 +135,10 @@ public:
         }
     }
 
+    void close() { _is_close = true; }
+
 private:
+    bool _is_close = false; // return 1 byte to empty request
     bool _is_destroy = false;
     int _port;
     const StorageEngine& _local;

@@ -30,6 +30,8 @@ class MemoryStorage {
 public:
     MemoryStorage() { _datas.reserve(MAX_ROW_SIZE); }
 
+    bool is_empty() const { return _datas.empty(); }
+
     void write(const Schema::Row* row) {
         Offset offset;
         std::string_view user_id;

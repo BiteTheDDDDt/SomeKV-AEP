@@ -22,10 +22,42 @@ public:
         _port = host.substr(x + 1, host.length() - x - 1);
         _remote = std::make_shared<NetworkIO>(stoi(_port), _local);
 
+        while (_local.is_empty()) {
+            bool all_alive = true;
+            for (auto peer : _peer_host) {
+                size_t remote_cnt =
+                        _remote->read_remote(peer.first, peer.second, nullptr, 0, nullptr);
+                if (remote_cnt == (size_t)-1) {
+                    all_alive = false;
+                }
+            }
+            if (all_alive) {
+                break;
+            }
+        }
+
         LOG(INFO) << "Init StorageEngineP2P: " << host << " ,peer_size=" << _peer_host.size();
     }
 
-    ~StorageEngineP2P() { LOG(INFO) << "Destroy StorageEngineP2P"; }
+    ~StorageEngineP2P() {
+        LOG(INFO) << "Start destroy StorageEngineP2P";
+        _remote->close();
+        while (true) {
+            bool all_close = true;
+            for (auto peer : _peer_host) {
+                size_t remote_cnt =
+                        _remote->read_remote(peer.first, peer.second, nullptr, 0, nullptr);
+                if (remote_cnt != (size_t)-1) {
+                    all_close = false;
+                }
+            }
+            if (all_close) {
+                break;
+            }
+        }
+
+        LOG(INFO) << "End destroy StorageEngineP2P";
+    }
 
     void write(const void* data) { _local.write(data); }
 
@@ -43,11 +75,14 @@ public:
 
         size_t cnt = 0;
 
-        for (size_t i = 0; i < _peer_host.size(); i++) {
-            int remote_cnt = _remote->read_remote(_peer_host[i].first, _peer_host[i].second, buffer,
-                                                  length, res);
-            LOG(INFO) << "remote_cnt=" << remote_cnt << " ,peer=" << _peer_host[i].first << ":"
-                      << _peer_host[i].second;
+        for (auto peer : _peer_host) {
+            size_t remote_cnt = _remote->read_remote(peer.first, peer.second, buffer, length, res);
+            LOG(INFO) << "remote_cnt=" << remote_cnt << " ,peer=" << peer.first << ":"
+                      << peer.second;
+            if (remote_cnt == (size_t)-1) {
+                continue;
+            }
+
             cnt += remote_cnt;
             res += remote_cnt * Schema::COLUMN_LENGTH[select_column];
         }
