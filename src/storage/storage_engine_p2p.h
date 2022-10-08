@@ -34,6 +34,7 @@ public:
             if (all_alive) {
                 break;
             }
+            sleep(1);
         }
 
         LOG(INFO) << "Init StorageEngineP2P: " << host << " ,peer_size=" << _peer_host.size();
@@ -54,6 +55,7 @@ public:
             if (all_close) {
                 break;
             }
+            sleep(1);
         }
 
         LOG(INFO) << "End destroy StorageEngineP2P";

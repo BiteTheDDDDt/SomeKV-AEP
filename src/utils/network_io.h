@@ -25,21 +25,14 @@ public:
 
         size_t length = 0;
         try {
-            int retry = 2;
-            while (--retry) {
-                try {
-                    asio::connect(sock, resolver.resolve(ip.data(), port.data()));
-                } catch (std::exception& e) {
-                    LOG(WARNING) << e.what();
-                    if (retry == 1) {
-                        LOG(INFO) << "Connect fail.";
-                        return -1;
-                    }
-                    continue;
-                }
-                LOG(INFO) << "Connect sucess.";
-                break;
+            try {
+                asio::connect(sock, resolver.resolve(ip.data(), port.data()));
+            } catch (std::exception& e) {
+                LOG(WARNING) << e.what();
+                LOG(INFO) << "Connect fail.";
+                return -1;
             }
+            LOG(INFO) << "Connect sucess.";
 
             if (!query_length) {
                 return 0;
