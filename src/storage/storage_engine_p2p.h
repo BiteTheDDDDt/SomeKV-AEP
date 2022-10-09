@@ -20,9 +20,10 @@ public:
         }
         int x = host.find_first_of(":");
         _port = host.substr(x + 1, host.length() - x - 1);
+        bool is_new_engine = _local.is_empty();
         _remote = std::make_shared<NetworkIO>(stoi(_port), _local);
 
-        while (_local.is_empty()) {
+        while (is_new_engine) {
             bool all_alive = true;
             for (auto peer : _peer_host) {
                 size_t remote_cnt =
