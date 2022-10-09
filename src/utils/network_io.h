@@ -91,7 +91,7 @@ public:
                 LOG(INFO) << "length=" << length;
                 if (!length) {
                     _received_ip.insert(sock.remote_endpoint().address().to_string());
-                    sock.write_some(asio::buffer(buffer, _is_close));
+                    sock.write_some(asio::buffer(buffer, _is_close ? 1 : 0));
                     return;
                 }
             }
