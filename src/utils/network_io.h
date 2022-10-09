@@ -41,11 +41,14 @@ public:
             LOG(WARNING) << e.what() << " length=" << length;
         }
 
-        if (length == 0) {
-            return 0;
-        }
-        if (length == 1) {
-            return -1;
+        if (query_length == 0) {
+            if (length == 0) {
+                return 0;
+            } else if (length == 1) {
+                return -1;
+            } else {
+                LOG(WARNING) << "Empty query return length invalid.";
+            }
         }
 
         result += length - sizeof(int);
@@ -83,13 +86,9 @@ public:
 
             // receive query binary
             {
-                asio::error_code error;
                 char* head = buffer;
-                size_t length = sock.read_some(asio::buffer(head, MAX_QUERY_BUFFER_LENGTH), error);
+                size_t length = sock.read_some(asio::buffer(head, MAX_QUERY_BUFFER_LENGTH));
                 LOG(INFO) << "length=" << length;
-                if (error) {
-                    LOG(INFO) << error;
-                }
                 if (!length) {
                     sock.write_some(asio::buffer(buffer, _is_close));
                     return;

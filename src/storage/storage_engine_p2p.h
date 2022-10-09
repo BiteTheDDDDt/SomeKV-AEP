@@ -48,7 +48,7 @@ public:
             for (auto peer : _peer_host) {
                 size_t remote_cnt =
                         _remote->read_remote(peer.first, peer.second, nullptr, 0, nullptr);
-                if (remote_cnt ==0) {
+                if (remote_cnt == 0) {
                     all_close = false;
                 }
             }
