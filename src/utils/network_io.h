@@ -33,8 +33,20 @@ public:
                 return -1;
             }
             LOG(INFO) << "Connect sucess.";
+            if (query_length == 0) {
+                return 0;
+            }
 
             sock.write_some(asio::buffer(query, query_length));
+
+            if (query_length == 1) {
+                length = sock.read_some(asio::buffer(result, 1));
+                if (length == 1) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
 
             length = sock.read_some(asio::buffer(result, MAX_QUERY_BUFFER_LENGTH));
         } catch (std::exception& e) {
@@ -89,7 +101,7 @@ public:
                 char* head = buffer;
                 size_t length = sock.read_some(asio::buffer(head, MAX_QUERY_BUFFER_LENGTH));
                 LOG(INFO) << "length=" << length;
-                if (!length) {
+                if (length == 0 || length == 1) {
                     _received_ip.insert(sock.remote_endpoint().address().to_string());
                     sock.write_some(asio::buffer(buffer, _is_close ? 1 : 0));
                     return;
