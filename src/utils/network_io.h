@@ -90,6 +90,7 @@ public:
                 size_t length = sock.read_some(asio::buffer(head, MAX_QUERY_BUFFER_LENGTH));
                 LOG(INFO) << "length=" << length;
                 if (!length) {
+                    _received_ip.insert(sock.remote_endpoint().address().to_string());
                     sock.write_some(asio::buffer(buffer, _is_close));
                     return;
                 }
@@ -123,11 +124,14 @@ public:
 
     void close() { _is_close = true; }
 
+    bool all_received() { return _received_ip.size() == 3; }
+
 private:
     bool _is_close = false;
     bool _is_destroy = false;
     int _port;
     const StorageEngine& _local;
+    std::set<std::string> _received_ip;
 
     std::unique_ptr<std::thread> _receiver;
 };
