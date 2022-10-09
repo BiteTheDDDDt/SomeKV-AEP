@@ -30,14 +30,15 @@ public:
                         _remote->read_remote(peer.first, peer.second, nullptr, 0, nullptr);
                 if (remote_cnt != 0) {
                     all_alive = false;
+                    LOG(INFO) << peer.first << " is not alive";
+                    break;
                 }
             }
-            sleep(1);
             if (all_alive) {
                 break;
             }
         }
-
+        sleep(1);
         LOG(INFO) << "Init StorageEngineP2P: " << host << " ,peer_size=" << _peer_host.size();
     }
 
@@ -51,14 +52,15 @@ public:
                         _remote->read_remote(peer.first, peer.second, nullptr, 0, nullptr);
                 if (remote_cnt == 0) {
                     all_close = false;
+                    LOG(INFO) << peer.first << " is not close";
+                    break;
                 }
             }
-            sleep(1);
             if (all_close) {
                 break;
             }
         }
-
+        sleep(1);
         LOG(INFO) << "End destroy StorageEngineP2P";
     }
 
