@@ -54,7 +54,7 @@ public:
             bool all_close = true;
             for (auto peer : _peer_host) {
                 size_t remote_cnt =
-                        _remote->read_remote(peer.first, peer.second, nullptr, 0, nullptr);
+                        _remote->read_remote(peer.first, peer.second, nullptr, 1, nullptr);
                 if (remote_cnt == 0) {
                     all_close = false;
                     LOG(INFO) << peer.first << " is not close";

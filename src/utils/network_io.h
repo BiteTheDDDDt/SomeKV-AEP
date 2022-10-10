@@ -99,7 +99,12 @@ public:
             // receive query binary
             {
                 char* head = buffer;
-                size_t length = sock.read_some(asio::buffer(head, MAX_QUERY_BUFFER_LENGTH));
+                size_t length = 0;
+                try {
+                    length = sock.read_some(asio::buffer(head, MAX_QUERY_BUFFER_LENGTH));
+                } catch (std::exception& e) {
+                    LOG(WARNING) << e.what();
+                }
                 LOG(INFO) << "length=" << length;
                 if (length == 0 || length == 1) {
                     _received_ip.insert(sock.remote_endpoint().address().to_string());
