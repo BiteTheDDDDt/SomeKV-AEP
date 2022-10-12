@@ -81,15 +81,15 @@ public:
         size_t length =
                 encode_query(select_column, where_column, column_key, column_key_len, buffer);
 
-        LOG(INFO) << "send query";
-        print_query(select_column, where_column, column_key, column_key_len);
+        // LOG(INFO) << "send query";
+        // print_query(select_column, where_column, column_key, column_key_len);
 
         size_t cnt = 0;
 
         for (auto peer : _peer_host) {
             size_t remote_cnt = _remote->read_remote(peer.first, peer.second, buffer, length, res);
-            LOG(INFO) << "remote_cnt=" << remote_cnt << " ,peer=" << peer.first << ":"
-                      << peer.second;
+            // LOG(INFO) << "remote_cnt=" << remote_cnt << " ,peer=" << peer.first << ":"
+            //          << peer.second;
             if (remote_cnt == FAIL_FLAG) {
                 continue;
             }

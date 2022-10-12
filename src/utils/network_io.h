@@ -29,10 +29,10 @@ public:
                 asio::connect(sock, resolver.resolve(ip.data(), port.data()));
             } catch (std::exception& e) {
                 LOG(WARNING) << e.what();
-                LOG(INFO) << "Connect fail.";
+                // LOG(INFO) << "Connect fail.";
                 return FAIL_FLAG;
             }
-            LOG(INFO) << "Connect sucess.";
+            // LOG(INFO) << "Connect sucess.";
 
             if (query_length == 1) {
                 sock.write_some(asio::buffer(&_is_close, 1));
@@ -77,9 +77,9 @@ public:
     }
 
     void receive(tcp::socket sock) {
-        LOG(INFO) << "receive query from " << sock.remote_endpoint().address() << ":"
-                  << sock.remote_endpoint().port() << " to " << sock.local_endpoint().address()
-                  << ":" << sock.local_endpoint().port();
+        // LOG(INFO) << "receive query from " << sock.remote_endpoint().address() << ":"
+        //           << sock.remote_endpoint().port() << " to " << sock.local_endpoint().address()
+        //           << ":" << sock.local_endpoint().port();
         try {
             char buffer[MAX_QUERY_BUFFER_LENGTH];
 
@@ -92,7 +92,7 @@ public:
                 } catch (std::exception& e) {
                     LOG(WARNING) << e.what();
                 }
-                LOG(INFO) << "length=" << length;
+                // LOG(INFO) << "length=" << length;
                 if (length == 0 || length == 1) {
                     _received_ip.insert(sock.remote_endpoint().address().to_string());
                     sock.write_some(asio::buffer(buffer, _is_close ? 1 : 0));
@@ -110,14 +110,14 @@ public:
 
                 decode_query(select_column, where_column, column_key, column_key_len, buffer);
 
-                print_query(select_column, where_column, column_key, column_key_len);
+                // print_query(select_column, where_column, column_key, column_key_len);
 
                 int cnt =
                         _local.read(select_column, where_column, column_key, column_key_len, head);
 
                 memcpy(head, &cnt, sizeof(int));
 
-                LOG(INFO) << "return_cnt=" << cnt;
+                // LOG(INFO) << "return_cnt=" << cnt;
                 sock.write_some(asio::buffer(
                         buffer, Schema::COLUMN_LENGTH[select_column] * cnt + sizeof(int)));
             }
