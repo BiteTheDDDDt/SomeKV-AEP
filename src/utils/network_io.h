@@ -47,9 +47,7 @@ public:
             LOG(WARNING) << e.what() << " ,length=" << length;
             return FAIL_FLAG;
         }
-        if (query_length == 1) {
-            return FAIL_FLAG;
-        }
+
         result += length - sizeof(int);
         return *(int*)result;
     }
@@ -69,9 +67,9 @@ public:
 
     void loop() {
         asio::io_context io_context;
-        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), _port));
         while (!_is_destroy) {
             LOG(INFO) << "Waiting for accept.";
+            tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), _port));
             std::thread(receive_query, this, acceptor.accept()).detach();
             LOG(INFO) << "Complete a receive.";
         }
