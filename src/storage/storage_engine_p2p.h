@@ -39,11 +39,10 @@ public:
                 break;
             }
         }
-
-        while (!_remote->all_received()) {
-            LOG(INFO) << "Waiting for all received";
-            sleep(1);
-        }
+        //while (!_remote->all_received()) {
+        //    LOG(INFO) << "Waiting for all received";
+        //    sleep(1);
+        //}
         sleep(1);
         LOG(INFO) << "Init StorageEngineP2P: " << host << " ,peer_size=" << _peer_host.size();
     }

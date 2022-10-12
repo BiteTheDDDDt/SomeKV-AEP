@@ -56,8 +56,9 @@ public:
     ~NetworkIO() {
         _is_destroy = true;
 
-        read_remote("127.0.0.1", std::to_string(_port), nullptr, 0,
-                    nullptr); // Send to local a query to avoid blocking.
+        char buffer[1];
+        read_remote("127.0.0.1", std::to_string(_port), nullptr, 1,
+                    buffer); // Send to local a query to avoid blocking.
 
         _receiver->join();
     }
@@ -93,9 +94,9 @@ public:
                     LOG(WARNING) << e.what();
                 }
                 // LOG(INFO) << "length=" << length;
-                if (length == 0 || length == 1) {
+                if (length == 1) {
                     _received_ip.insert(sock.remote_endpoint().address().to_string());
-                    sock.write_some(asio::buffer(buffer, _is_close ? 1 : 0));
+                    sock.write_some(asio::buffer(&_is_close, 1));
                     return;
                 }
             }
