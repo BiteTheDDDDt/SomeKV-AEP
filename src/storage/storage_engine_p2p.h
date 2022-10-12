@@ -27,7 +27,8 @@ public:
             sleep(1);
             bool all_alive = true;
             for (auto peer : _peer_host) {
-                size_t result = _remote->read_remote(peer.first, peer.second, nullptr, 1, nullptr);
+                char buffer[1];
+                size_t result = _remote->read_remote(peer.first, peer.second, nullptr, 1, buffer);
                 if (result != FAIL_FLAG) {
                     all_alive = false;
                     LOG(INFO) << peer.first << " is not alive";
@@ -50,10 +51,11 @@ public:
     ~StorageEngineP2P() {
         LOG(INFO) << "Start destroy StorageEngineP2P";
         _remote->close();
+        char buffer[1];
         while (true) {
             bool all_close = true;
             for (auto peer : _peer_host) {
-                size_t result = _remote->read_remote(peer.first, peer.second, nullptr, 1, nullptr);
+                size_t result = _remote->read_remote(peer.first, peer.second, nullptr, 1, buffer);
                 if (result != 0) {
                     all_close = false;
                     LOG(INFO) << peer.first << " is not close";
