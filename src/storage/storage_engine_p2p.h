@@ -62,11 +62,11 @@ public:
                     break;
                 }
             }
+            sleep(1);
             if (all_close) {
                 break;
             }
         }
-        sleep(1);
         LOG(INFO) << "End destroy StorageEngineP2P";
     }
 
@@ -90,7 +90,7 @@ public:
             size_t remote_cnt = _remote->read_remote(peer.first, peer.second, buffer, length, res);
             LOG(INFO) << "remote_cnt=" << remote_cnt << " ,peer=" << peer.first << ":"
                       << peer.second;
-            if (remote_cnt == (size_t)-1) {
+            if (remote_cnt == FAIL_FLAG) {
                 continue;
             }
 

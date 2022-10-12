@@ -45,6 +45,7 @@ public:
             length = sock.read_some(asio::buffer(result, MAX_QUERY_BUFFER_LENGTH));
         } catch (std::exception& e) {
             LOG(WARNING) << e.what() << " ,length=" << length;
+            return FAIL_FLAG;
         }
         if (query_length == 1) {
             return FAIL_FLAG;
@@ -66,9 +67,9 @@ public:
     static void receive_query(NetworkIO* io, tcp::socket&& sock) { io->receive(std::move(sock)); }
 
     void loop() {
+        asio::io_context io_context;
+        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), _port));
         while (!_is_destroy) {
-            asio::io_context io_context;
-            tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), _port));
             LOG(INFO) << "Waiting for accept.";
             std::thread(receive_query, this, acceptor.accept()).detach();
             LOG(INFO) << "Complete a receive.";
