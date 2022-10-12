@@ -29,7 +29,7 @@ public:
             for (auto peer : _peer_host) {
                 char buffer[1];
                 size_t result = _remote->read_remote(peer.first, peer.second, nullptr, 1, buffer);
-                if (result != FAIL_FLAG) {
+                if (result == FAIL_FLAG) {
                     all_alive = false;
                     LOG(INFO) << peer.first << " is not alive";
                     break;
@@ -55,7 +55,7 @@ public:
             bool all_close = true;
             for (auto peer : _peer_host) {
                 size_t result = _remote->read_remote(peer.first, peer.second, nullptr, 1, buffer);
-                if (result != 0) {
+                if (result == 0) {
                     all_close = false;
                     LOG(INFO) << peer.first << " is not close";
                     break;

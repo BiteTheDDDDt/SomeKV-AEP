@@ -40,9 +40,8 @@ public:
                 return *result;
             } else {
                 sock.write_some(asio::buffer(query, query_length));
+                length = sock.read_some(asio::buffer(result, MAX_QUERY_BUFFER_LENGTH));
             }
-
-            length = sock.read_some(asio::buffer(result, MAX_QUERY_BUFFER_LENGTH));
         } catch (std::exception& e) {
             LOG(WARNING) << e.what() << " ,length=" << length;
             return FAIL_FLAG;
@@ -67,9 +66,9 @@ public:
 
     void loop() {
         asio::io_context io_context;
+        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), _port));
         while (!_is_destroy) {
             LOG(INFO) << "Waiting for accept.";
-            tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), _port));
             std::thread(receive_query, this, acceptor.accept()).detach();
             LOG(INFO) << "Complete a receive.";
         }
