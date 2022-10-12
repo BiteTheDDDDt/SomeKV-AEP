@@ -25,6 +25,8 @@ constexpr size_t MAX_ROW_SIZE = 50000000;
 
 constexpr int MAX_QUERY_BUFFER_LENGTH = 4096;
 
+constexpr size_t FAIL_FLAG = -1;
+
 inline uint64_t get_file_size(std::string path) {
     struct ::stat file_stat;
     if (stat(path.data(), &file_stat) != 0) {

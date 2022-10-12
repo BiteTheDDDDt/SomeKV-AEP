@@ -24,11 +24,11 @@ public:
         _remote = std::make_shared<NetworkIO>(stoi(_port), _local);
         LOG(INFO) << "is_new_engine=" << is_new_engine;
         while (true) {
+            sleep(1);
             bool all_alive = true;
             for (auto peer : _peer_host) {
-                size_t remote_cnt =
-                        _remote->read_remote(peer.first, peer.second, nullptr, 0, nullptr);
-                if (remote_cnt != 0) {
+                size_t result = _remote->read_remote(peer.first, peer.second, nullptr, 1, nullptr);
+                if (result != FAIL_FLAG) {
                     all_alive = false;
                     LOG(INFO) << peer.first << " is not alive";
                     break;
@@ -53,9 +53,8 @@ public:
         while (true) {
             bool all_close = true;
             for (auto peer : _peer_host) {
-                size_t remote_cnt =
-                        _remote->read_remote(peer.first, peer.second, nullptr, 1, nullptr);
-                if (remote_cnt == 0) {
+                size_t result = _remote->read_remote(peer.first, peer.second, nullptr, 1, nullptr);
+                if (result != 0) {
                     all_close = false;
                     LOG(INFO) << peer.first << " is not close";
                     break;

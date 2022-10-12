@@ -30,39 +30,25 @@ public:
             } catch (std::exception& e) {
                 LOG(WARNING) << e.what();
                 LOG(INFO) << "Connect fail.";
-                return -1;
+                return FAIL_FLAG;
             }
             LOG(INFO) << "Connect sucess.";
-            if (query_length == 0) {
-                return 0;
-            }
-
-            sock.write_some(asio::buffer(query, query_length));
 
             if (query_length == 1) {
+                sock.write_some(asio::buffer(&_is_close, 1));
                 length = sock.read_some(asio::buffer(result, 1));
-                if (length == 1) {
-                    return -1;
-                } else {
-                    return 0;
-                }
+                return *result;
+            } else {
+                sock.write_some(asio::buffer(query, query_length));
             }
 
             length = sock.read_some(asio::buffer(result, MAX_QUERY_BUFFER_LENGTH));
         } catch (std::exception& e) {
-            LOG(WARNING) << e.what() << " length=" << length;
+            LOG(WARNING) << e.what() << " ,length=" << length;
         }
-
-        if (query_length == 0) {
-            if (length == 0) {
-                return 0;
-            } else if (length == 1) {
-                return -1;
-            } else {
-                LOG(WARNING) << "Empty query return length invalid.";
-            }
+        if (query_length == 1) {
+            return FAIL_FLAG;
         }
-
         result += length - sizeof(int);
         return *(int*)result;
     }
