@@ -115,7 +115,7 @@ public:
 
                 memcpy(head, &cnt, sizeof(int));
 
-                // LOG(INFO) << "return_cnt=" << cnt;
+                LOG(INFO) << "return_cnt=" << cnt;
                 sock.write_some(asio::buffer(
                         buffer, Schema::COLUMN_LENGTH[select_column] * cnt + sizeof(int)));
             }

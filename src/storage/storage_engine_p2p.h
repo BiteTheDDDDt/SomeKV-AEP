@@ -87,8 +87,8 @@ public:
 
         for (auto peer : _peer_host) {
             size_t remote_cnt = _remote->read_remote(peer.first, peer.second, buffer, length, res);
-            // LOG(INFO) << "remote_cnt=" << remote_cnt << " ,peer=" << peer.first << ":"
-            //          << peer.second;
+            LOG(INFO) << "remote_cnt=" << remote_cnt << " ,peer=" << peer.first << ":"
+                      << peer.second;
             if (remote_cnt == FAIL_FLAG) {
                 continue;
             }
