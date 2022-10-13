@@ -100,7 +100,6 @@ public:
 
             // Decode query and read from local, then write result back as [binary_result(x byte) + result_cnt(4 byte)]
             {
-                char* head = buffer;
                 int32_t select_column;
                 int32_t where_column;
                 char column_key[128];
@@ -110,14 +109,15 @@ public:
 
                 // print_query(select_column, where_column, column_key, column_key_len);
 
-                int cnt =
-                        _local.read(select_column, where_column, column_key, column_key_len, head);
+                int cnt = _local.read(select_column, where_column, column_key, column_key_len,
+                                      buffer);
 
-                memcpy(head, &cnt, sizeof(int));
+                int data_length = Schema::COLUMN_LENGTH[select_column] * cnt;
+
+                memcpy(buffer + data_length, &cnt, sizeof(int));
 
                 LOG(INFO) << "return_cnt=" << cnt;
-                sock.write_some(asio::buffer(
-                        buffer, Schema::COLUMN_LENGTH[select_column] * cnt + sizeof(int)));
+                sock.write_some(asio::buffer(buffer, data_length + sizeof(int)));
             }
         } catch (std::exception& e) {
             LOG(WARNING) << e.what();
